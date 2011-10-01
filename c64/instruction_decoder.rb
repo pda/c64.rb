@@ -164,8 +164,7 @@ module C64
     }
 
     def decode input
-      tuple = TABLE[input]
-      Instruction.new *tuple
+      Instruction.new *TABLE[input]
     end
 
   end
