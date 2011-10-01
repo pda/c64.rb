@@ -45,12 +45,13 @@ module C64
       end
 
       it "can set and unset zero? flag" do
-        s = status(0b01010101)
-        s.zero = true
-        s.zero?.must_equal true
-        s.zero = false
-        s.zero?.must_equal false
-        s.to_i.must_equal 0b01010101
+        r = Registers.new(nil, nil, nil, nil, 0b01010101, nil)
+        r.status.zero?.must_equal false
+        r.status.zero = true
+        r.status.zero?.must_equal true
+        r.status.zero = false
+        r.status.zero?.must_equal false
+        r.status.to_i.must_equal 0b01010101
       end
 
     end

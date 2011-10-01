@@ -13,30 +13,30 @@ module C64
         carry:     0
       }
 
-      def initialize sr
-        @sr = sr
+      def initialize registers
+        @registers = registers
       end
 
       def to_i
-        @sr
+        @registers.sr
       end
 
       FLAGS.each do |flag, bit|
         define_method "#{flag}?" do
-          (@sr >> bit & 1) == 1
+          (@registers.sr >> bit & 1) == 1
         end
         define_method "#{flag}=" do |on|
           if on
-            @sr |= 1 << bit
+            @registers.sr |= 1 << bit
           else
-            @sr &= ~(1 << bit)
+            @registers.sr &= ~(1 << bit)
           end
         end
       end
     end
 
     def status
-      Status.new(sr)
+      Status.new(self)
     end
 
   end
