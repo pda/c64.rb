@@ -22,7 +22,7 @@ module C64
         end
       end
 
-      it "is negative for 0b10000000" do
+      it "is negative? for 0b10000000" do
         status(0b10000000).negative?.must_equal true
       end
       it "is overflow? for 0b01000000" do
@@ -43,6 +43,16 @@ module C64
       it "is carry? for 0b00000001" do
         status(0b00000001).carry?.must_equal true
       end
+
+      it "can set and unset zero? flag" do
+        s = status(0b01010101)
+        s.zero = true
+        s.zero?.must_equal true
+        s.zero = false
+        s.zero?.must_equal false
+        s.to_i.must_equal 0b01010101
+      end
+
     end
   end
 end
