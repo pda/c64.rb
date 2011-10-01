@@ -178,6 +178,7 @@ module C64
       when :zeropage_y then memory[int8(op) + registers.y]
       else raise "TODO"
       end
+      registers.status.zero = registers[reg].zero?
     end
     private :LDreg
 

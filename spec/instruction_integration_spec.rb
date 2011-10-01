@@ -154,6 +154,18 @@ module C64
       end
     end
 
+    describe "LDA setting SR flags" do
+      it "sets zero flag off" do
+        registers.status.zero = true
+        load_program 0xA9, 0x01 ; step
+        registers.status.zero?.must_equal false
+      end
+      it "sets zero flag on" do
+        load_program 0xA9, 0x00 ; step
+        registers.status.zero?.must_equal true
+      end
+    end
+
     describe :NOP do
       it "does nothing" do
         load_program 0xEA
