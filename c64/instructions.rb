@@ -15,7 +15,7 @@ module C64
     end
 
     # arithmetic shift left
-    def ASL addr, op
+    def ASL addr
       raise "TODO"
     end
 
@@ -56,7 +56,7 @@ module C64
     end
 
     # interrupt
-    def BRK addr, op
+    def BRK addr
       raise "TODO"
     end
 
@@ -71,22 +71,22 @@ module C64
     end
 
     # clear carry
-    def CLC addr, op
+    def CLC addr
       raise "TODO"
     end
 
     # clear decimal
-    def CLD addr, op
+    def CLD addr
       raise "TODO"
     end
 
     # clear interrupt disable
-    def CLI addr, op
+    def CLI addr
       raise "TODO"
     end
 
     # clear overflow
-    def CLV addr, op
+    def CLV addr
       raise "TODO"
     end
 
@@ -106,7 +106,7 @@ module C64
     end
 
     # decrement
-    def DEC addr, op
+    def DEC addr
       raise "TODO"
     end
 
@@ -182,7 +182,7 @@ module C64
     private :LDreg
 
     # logical shift right
-    def LSR addr, op
+    def LSR addr
       raise "TODO"
     end
 
@@ -196,17 +196,17 @@ module C64
     end
 
     # push accumulator
-    def PHA addr, op
+    def PHA addr
       raise "TODO"
     end
 
     # push processor status (SR)
-    def PHP addr, op
+    def PHP addr
       raise "TODO"
     end
 
     # pull accumulator
-    def PLA addr, op
+    def PLA addr
       raise "TODO"
     end
 
@@ -221,12 +221,12 @@ module C64
     end
 
     # rotate right
-    def ROR addr, op
+    def ROR addr
       raise "TODO"
     end
 
     # return from interrupt
-    def RTI addr, op
+    def RTI addr
       raise "TODO"
     end
 
@@ -245,17 +245,17 @@ module C64
     end
 
     # set carry
-    def SEC addr, op
+    def SEC addr
       raise "TODO"
     end
 
     # set decimal
-    def SED addr, op
+    def SED addr
       raise "TODO"
     end
 
     # set interrupt disable
-    def SEI addr, op
+    def SEI addr
       raise "TODO"
     end
 
@@ -285,32 +285,32 @@ module C64
     private :STreg
 
     # transfer accumulator to X
-    def TAX addr, op
+    def TAX addr
       raise "TODO"
     end
 
     # transfer accumulator to Y
-    def TAY addr, op
+    def TAY addr
       raise "TODO"
     end
 
     # transfer stack pointer to X
-    def TSX addr, op
+    def TSX addr
       raise "TODO"
     end
 
     # transfer X to accumulator
-    def TXA addr, op
+    def TXA addr
       raise "TODO"
     end
 
     # transfer X to stack pointer
-    def TXS addr, op
+    def TXS addr
       raise "TODO"
     end
 
     # transfer Y to accumulator
-    def TYA addr, op
+    def TYA addr
       raise "TODO"
     end
 
