@@ -157,7 +157,7 @@ module C64
 
     # load accumulator
     def LDA addr, op
-      LDreg :a, addr, op
+      LDreg :ac, addr, op
     end
 
     # load X
