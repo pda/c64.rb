@@ -107,21 +107,50 @@ module C64
       end
     end
 
-    describe :LDX do
-      it "loads immediate value into X register" do
-        load_program 0xA2, 123
-        step
-        registers.pc.must_equal 2
-        registers.x.must_equal 123
+    { ac: 0xA9, x: 0xA2, y: 0xA0 }.each do |reg, op|
+      describe "LD#{reg.to_s[0].upcase} immediate" do
+        it "loads immediate value into #{reg} register" do
+          load_program op, 123
+          step
+          registers.pc.must_equal 2
+          registers[reg].must_equal 123
+        end
       end
     end
 
-    describe :LDY do
-      it "loads immediate value into Y register" do
-        load_program 0xA0, 123
+    { ac: 0xA5, x: 0xA6, y: 0xA4 }.each do |reg, op|
+      describe "LD#{reg.to_s[0].upcase} zeropage" do
+        it "loads zeropage value into #{reg} register" do
+          load_program op, 0x10
+          memory[0x10] = 32
+          step
+          registers.pc.must_equal 2
+          registers[reg].must_equal 32
+        end
+      end
+    end
+
+    { ac: 0xB5, y: 0xB4 }.each do |reg, op|
+      describe "LD#{reg.to_s[0].upcase} zeropage_x" do
+        it "loads zeropage X-indexed value into #{reg} register" do
+          load_program op, 0x10
+          registers.x = 0x04
+          memory[0x10 + 0x04] = 32
+          step
+          registers.pc.must_equal 2
+          registers[reg].must_equal 32
+        end
+      end
+    end
+
+    describe "LDX zeropage_y" do
+      it "loads zeropage Y-indexed value into X register" do
+        load_program 0xB6, 0x10
+        registers.y = 0x04
+        memory[0x10 + 0x04] = 32
         step
         registers.pc.must_equal 2
-        registers.y.must_equal 123
+        registers.x.must_equal 32
       end
     end
 

@@ -171,11 +171,12 @@ module C64
     end
 
     def LDreg reg, addr, op
-      case addr
-      when :immediate
-        registers[reg] = op.ord
-      else
-        raise "TODO"
+      registers[reg] = case addr
+      when :immediate  then op.ord
+      when :zeropage   then memory[int8(op)]
+      when :zeropage_x then memory[int8(op) + registers.x]
+      when :zeropage_y then memory[int8(op) + registers.y]
+      else raise "TODO"
       end
     end
     private :LDreg
