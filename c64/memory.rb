@@ -3,19 +3,19 @@ module C64
 
     def initialize
       @size = 0x10000
-      @bytes = Array.new size, 0
+      @bytes = open("/dev/zero") { |f| f.read @size }
     end
 
     attr_accessor :size
 
     def [] index
       check_bounds index
-      @bytes[index]
+      @bytes[index].unpack("C").first
     end
 
     def []= index, value
       check_bounds index
-      @bytes[index] = value
+      @bytes[index] = [value].pack("C")
     end
 
     def inspect
