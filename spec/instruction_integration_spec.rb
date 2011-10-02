@@ -8,91 +8,73 @@ module C64
     def registers; cpu.send :registers; end
     def memory; cpu.send :memory; end
 
-    def load_program *bytes
-      bytes.each_with_index { |byte, i| memory[i] = byte }
-    end
-
-    def step n = 1
-      n.times { cpu.step }
+    # Usage: run_instructions "AA BB", "CC DD EE", at: 0x400
+    def run_instructions *i
+      options = if i.last.is_a? Hash then i.pop else {} end
+      offset = options[:at] || 0
+      registers.pc = offset - 1
+      i.each do |instruction|
+        instruction.split(" ").each do |hex|
+          memory[offset] = hex.to_i(16)
+          offset += 1
+        end
+      end
+      i.length.times { cpu.step }
     end
 
     describe :BEQ do
-      it "branches forwards for z = 1" do
+      it "branches forwards for zero? true" do
         registers.sr = 0b00000010
-        registers.pc = 1023
-        memory[1024] = 0xF0
-        memory[1025] = 100
-        step
-        registers.pc.must_equal 1125
+        run_instructions "F0 08", at: 0x0400
+        registers.pc.must_equal 0x0409
       end
-      it "branches backwards for z = 1" do
+      it "branches backwards for zero? true" do
         registers.sr = 0b00000010
-        registers.pc = 1023
-        memory[1024] = 0xF0
-        memory[1025] = 0x9C # -100
-        step
-        registers.pc.must_equal 925
+        run_instructions "F0 F8", at: 0x0407
+        registers.pc.must_equal 0x0400
       end
-      it "does not branch for z = 0" do
+      it "does not branch for zero? false" do
         registers.sr = 0b00000000
-        registers.pc = 1023
-        memory[1024] = 0xF0
-        memory[1025] = 100
-        step
-        registers.pc.must_equal 1025
+        run_instructions "F0 08", at: 0x0400
+        registers.pc.must_equal 0x0401
       end
     end
 
     describe :BNE do
-      it "branches forwards for z = 0" do
+      it "branches forwards for zero? false" do
         registers.sr = 0b00000000
-        registers.pc = 1023
-        memory[1024] = 0xD0
-        memory[1025] = 100
-        step
-        registers.pc.must_equal 1125
+        run_instructions "D0 08", at: 0x0400
+        registers.pc.must_equal 0x0409
       end
-      it "branches backwards for z = 0" do
+      it "branches backwards for zero? false" do
         registers.sr = 0b00000000
-        registers.pc = 1023
-        memory[1024] = 0xD0
-        memory[1025] = 0x9C # -100
-        step
-        registers.pc.must_equal 925
+        run_instructions "D0 F8", at: 0x0407
+        registers.pc.must_equal 0x0400
       end
-      it "does not branch for z = 1" do
+      it "does not branch for zero? true" do
         registers.sr = 0b00000010
-        registers.pc = 1023
-        memory[1024] = 0xD0
-        memory[1025] = 100
-        step
-        registers.pc.must_equal 1025
+        run_instructions "D0 08", at: 0x0400
+        registers.pc.must_equal 0x0401
       end
     end
 
     describe :INX do
       it "increments x by one" do
-        load_program 0xE8
-        step
+        run_instructions "E8"
         registers.x.must_equal 1
       end
     end
 
     describe :INY do
       it "increments y by one" do
-        load_program 0xC8
-        step
+        run_instructions "C8"
         registers.y.must_equal 1
       end
     end
 
     describe :JSR do
       it "stores PC, jumps to address" do
-        registers.pc = 1000
-        memory[1001] = 0x20
-        memory[1002] = 0xAD
-        memory[1003] = 0xDE
-        step
+        run_instructions "20 AD DE", at: 1000
         registers.pc.must_equal 0xDEAD - 1
 
         # The return address pushed to the stack by JSR is that of the
@@ -101,8 +83,8 @@ module C64
         # the following instruction.
         # http://en.wikipedia.org/wiki/MOS_Technology_6502#Bugs_and_quirks
 
-        # little-endian 0xEB03 == 1003
-        memory[registers.sp + 1].must_equal 0xEB
+        # little-endian 0xEA03 == 1002
+        memory[registers.sp + 1].must_equal 0xEA
         memory[registers.sp + 2].must_equal 0x03
       end
     end
@@ -110,10 +92,8 @@ module C64
     { ac: 0xA9, x: 0xA2, y: 0xA0 }.each do |reg, op|
       describe "LD#{reg.to_s[0].upcase} immediate" do
         it "loads immediate value into #{reg} register" do
-          load_program op, 123
-          step
-          registers.pc.must_equal 1
-          registers[reg].must_equal 123
+          run_instructions "#{op.to_s(16)} AA"
+          registers[reg].must_equal 0xAA
         end
       end
     end
@@ -121,11 +101,9 @@ module C64
     { ac: 0xA5, x: 0xA6, y: 0xA4 }.each do |reg, op|
       describe "LD#{reg.to_s[0].upcase} zeropage" do
         it "loads zeropage value into #{reg} register" do
-          load_program op, 0x10
-          memory[0x10] = 32
-          step
-          registers.pc.must_equal 1
-          registers[reg].must_equal 32
+          memory[0x10] = 0xAA
+          run_instructions "#{op.to_s(16)} 10"
+          registers[reg].must_equal 0xAA
         end
       end
     end
@@ -133,43 +111,38 @@ module C64
     { ac: 0xB5, y: 0xB4 }.each do |reg, op|
       describe "LD#{reg.to_s[0].upcase} zeropage_x" do
         it "loads zeropage X-indexed value into #{reg} register" do
-          load_program op, 0x10
           registers.x = 0x04
-          memory[0x10 + 0x04] = 32
-          step
-          registers.pc.must_equal 1
-          registers[reg].must_equal 32
+          memory[0x10 + 0x04] = 0xAA
+          run_instructions "#{op.to_s(16)} 10"
+          registers[reg].must_equal 0xAA
         end
       end
     end
 
     describe "LDX zeropage_y" do
       it "loads zeropage Y-indexed value into X register" do
-        load_program 0xB6, 0x10
         registers.y = 0x04
-        memory[0x10 + 0x04] = 32
-        step
-        registers.pc.must_equal 1
-        registers.x.must_equal 32
+        memory[0x10 + 0x04] = 0xAA
+        run_instructions "B6 10"
+        registers.x.must_equal 0xAA
       end
     end
 
     describe "LDA setting SR flags" do
       it "sets zero flag off" do
         registers.status.zero = true
-        load_program 0xA9, 0x01 ; step
+        run_instructions "A9 01"
         registers.status.zero?.must_equal false
       end
       it "sets zero flag on" do
-        load_program 0xA9, 0x00 ; step
+        run_instructions "A9 00"
         registers.status.zero?.must_equal true
       end
     end
 
     describe :NOP do
       it "does nothing" do
-        load_program 0xEA
-        step
+        run_instructions "EA"
         registers.pc.must_equal 0
       end
     end
@@ -177,9 +150,9 @@ module C64
     describe :RTS do
       it "returns from subroutine, restores stack pointer" do
         sp = registers.sp
-        load_program 0x20, 0xAD, 0xDE # JSR to 0xDEAD
-        memory[0xDEAD] = 0x60         # RTS
-        step 2
+        memory[0xDEAD] = 0x60       # RTS
+        run_instructions "20 AD DE" # JSR to 0xDEAD
+        cpu.step
         registers.pc.must_equal 0x02
         registers.sp.must_equal sp
       end
@@ -187,23 +160,15 @@ module C64
 
     describe :STX do
       it "stores X into memory (absolute)" do
-        load_program \
-          0xA2, 123, # LDX
-          0x8E, 0xAD, 0xDE # STX
-        step 2
-        registers.pc.must_equal 4
-        memory[0xDEAD].must_equal 123
+        run_instructions "A2 AA", "8E AD DE" # LDX, STX
+        memory[0xDEAD].must_equal 0xAA
       end
     end
 
     describe :STY do
       it "stores Y into memory (absolute)" do
-        load_program \
-          0xA0, 123, # LDY
-          0x8C, 0xAD, 0xDE # STY
-        step 2
-        registers.pc.must_equal 4
-        memory[0xDEAD].must_equal 123
+        run_instructions "A0 AA", "8C AD DE" # LDY, STY
+        memory[0xDEAD].must_equal 0xAA
       end
     end
 
