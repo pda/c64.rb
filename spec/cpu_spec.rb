@@ -11,19 +11,19 @@ module C64
     end
 
     it "initializes accumulator to zero" do
-      registers.pc.must_equal 0
+      registers.ac.must_equal 0
     end
 
     it "initializes x to zero" do
-      registers.pc.must_equal 0
+      registers.x.must_equal 0
     end
 
     it "initializes y to zero" do
-      registers.pc.must_equal 0
+      registers.y.must_equal 0
     end
 
     it "initializes status to 0b00000000" do
-      registers.pc.must_equal 0
+      registers.sr.must_equal 0
     end
 
     it "initializes stack pointer to 0x01FF" do
