@@ -26,8 +26,8 @@ module C64
       registers.sr.must_equal 0
     end
 
-    it "initializes stack pointer to 0x01FF" do
-      registers.sp.must_equal 0x01FF
+    it "initializes stack pointer to 0xFF" do
+      registers.sp.must_equal 0xFF
     end
 
   end

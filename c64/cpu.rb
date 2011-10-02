@@ -14,7 +14,7 @@ module C64
         r.x = 0
         r.y = 0
         r.sr = 0
-        r.sp = 0x01FF
+        r.sp = 0xFF
       end
       @decoder = InstructionDecoder.new
     end
