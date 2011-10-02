@@ -13,11 +13,11 @@ module C64
     end
 
     # register readers
-    def pc; @pc.to_i end
-    def ac; @ac.to_i end
-    def x; @x.to_i end
-    def y; @y.to_i end
-    def sp; @sp.to_i end
+    def pc; @pc end
+    def ac; @ac end
+    def x; @x end
+    def y; @y end
+    def sp; @sp end
     def sr; @sr end
 
     # register writers

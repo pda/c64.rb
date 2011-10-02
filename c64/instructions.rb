@@ -174,8 +174,8 @@ module C64
       registers[reg] = case addr
       when :immediate  then op.ord
       when :zeropage   then memory[int8(op)]
-      when :zeropage_x then memory[int8(op) + registers.x]
-      when :zeropage_y then memory[int8(op) + registers.y]
+      when :zeropage_x then memory[int8(op) + registers.x.to_i] # TODO: no .to_i once int8() is Int8 instance
+      when :zeropage_y then memory[int8(op) + registers.y.to_i] # TODO: same
       else raise "TODO"
       end
       registers.status.zero = registers[reg].zero?
@@ -318,8 +318,8 @@ module C64
     private
 
     def int8   str; str.unpack("c").first; end
-    def uint8  str; str.unpack("C").first; end
-    def uint16 str; str.unpack("v").first; end
+    def uint8  str; Uint8.unpack(str); end
+    def uint16 str; Uint16.unpack(str); end
 
   end
 end
