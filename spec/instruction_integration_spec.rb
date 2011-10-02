@@ -19,54 +19,54 @@ module C64
     describe :BEQ do
       it "branches forwards for z = 1" do
         registers.sr = 0b00000010
-        registers.pc = 1024
+        registers.pc = 1023
         memory[1024] = 0xF0
         memory[1025] = 100
         step
-        registers.pc.must_equal 1126
+        registers.pc.must_equal 1125
       end
       it "branches backwards for z = 1" do
         registers.sr = 0b00000010
-        registers.pc = 1024
+        registers.pc = 1023
         memory[1024] = 0xF0
         memory[1025] = 0x9C # -100
         step
-        registers.pc.must_equal 926
+        registers.pc.must_equal 925
       end
       it "does not branch for z = 0" do
         registers.sr = 0b00000000
-        registers.pc = 1024
+        registers.pc = 1023
         memory[1024] = 0xF0
         memory[1025] = 100
         step
-        registers.pc.must_equal 1026
+        registers.pc.must_equal 1025
       end
     end
 
     describe :BNE do
       it "branches forwards for z = 0" do
         registers.sr = 0b00000000
-        registers.pc = 1024
+        registers.pc = 1023
         memory[1024] = 0xD0
         memory[1025] = 100
         step
-        registers.pc.must_equal 1126
+        registers.pc.must_equal 1125
       end
       it "branches backwards for z = 0" do
         registers.sr = 0b00000000
-        registers.pc = 1024
+        registers.pc = 1023
         memory[1024] = 0xD0
         memory[1025] = 0x9C # -100
         step
-        registers.pc.must_equal 926
+        registers.pc.must_equal 925
       end
       it "does not branch for z = 1" do
         registers.sr = 0b00000010
-        registers.pc = 1024
+        registers.pc = 1023
         memory[1024] = 0xD0
         memory[1025] = 100
         step
-        registers.pc.must_equal 1026
+        registers.pc.must_equal 1025
       end
     end
 
@@ -89,11 +89,11 @@ module C64
     describe :JSR do
       it "stores PC, jumps to address" do
         registers.pc = 1000
-        memory[1000] = 0x20
-        memory[1001] = 0xAD
-        memory[1002] = 0xDE
+        memory[1001] = 0x20
+        memory[1002] = 0xAD
+        memory[1003] = 0xDE
         step
-        registers.pc.must_equal 0xDEAD
+        registers.pc.must_equal 0xDEAD - 1
 
         # The return address pushed to the stack by JSR is that of the
         # last byte of the JSR operand (that is, the most significant
@@ -112,7 +112,7 @@ module C64
         it "loads immediate value into #{reg} register" do
           load_program op, 123
           step
-          registers.pc.must_equal 2
+          registers.pc.must_equal 1
           registers[reg].must_equal 123
         end
       end
@@ -124,7 +124,7 @@ module C64
           load_program op, 0x10
           memory[0x10] = 32
           step
-          registers.pc.must_equal 2
+          registers.pc.must_equal 1
           registers[reg].must_equal 32
         end
       end
@@ -137,7 +137,7 @@ module C64
           registers.x = 0x04
           memory[0x10 + 0x04] = 32
           step
-          registers.pc.must_equal 2
+          registers.pc.must_equal 1
           registers[reg].must_equal 32
         end
       end
@@ -149,7 +149,7 @@ module C64
         registers.y = 0x04
         memory[0x10 + 0x04] = 32
         step
-        registers.pc.must_equal 2
+        registers.pc.must_equal 1
         registers.x.must_equal 32
       end
     end
@@ -170,17 +170,17 @@ module C64
       it "does nothing" do
         load_program 0xEA
         step
-        registers.pc.must_equal 1
+        registers.pc.must_equal 0
       end
     end
 
     describe :RTS do
-      it "works" do
+      it "returns from subroutine, restores stack pointer" do
         sp = registers.sp
         load_program 0x20, 0xAD, 0xDE # JSR to 0xDEAD
         memory[0xDEAD] = 0x60         # RTS
         step 2
-        registers.pc.must_equal 0x03
+        registers.pc.must_equal 0x02
         registers.sp.must_equal sp
       end
     end
@@ -191,7 +191,7 @@ module C64
           0xA2, 123, # LDX
           0x8E, 0xAD, 0xDE # STX
         step 2
-        registers.pc.must_equal 5
+        registers.pc.must_equal 4
         memory[0xDEAD].must_equal 123
       end
     end
@@ -202,7 +202,7 @@ module C64
           0xA0, 123, # LDY
           0x8C, 0xAD, 0xDE # STY
         step 2
-        registers.pc.must_equal 5
+        registers.pc.must_equal 4
         memory[0xDEAD].must_equal 123
       end
     end

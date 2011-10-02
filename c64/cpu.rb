@@ -9,7 +9,7 @@ module C64
     def initialize
       @memory = Memory.new
       @registers = Registers.new.tap do |r|
-        r.pc = 0
+        r.pc = -1 # TODO: start at 0xFFFF, where 0xFFFF + 1 == 0x0000
         r.ac = 0
         r.x = 0
         r.y = 0
@@ -22,12 +22,12 @@ module C64
     include Instructions
 
     def step
+      registers.pc += 1
       @decoder.decode(memory[registers.pc]).tap do |i|
+        registers.pc += i.operand_size
         parameters = [ i.addressing ]
         parameters << read_operand(i) if i.operand?
-        registers.pc += i.operand_size
         send i.name, *parameters
-        registers.pc += 1
       end
     end
 
@@ -37,8 +37,8 @@ module C64
 
     def read_operand instruction
       String.new.tap do |operand|
-        instruction.operand_size.times do |i|
-          operand << memory[registers.pc + 1 + i]
+        (instruction.operand_size - 1).downto(0) do |i|
+          operand << memory[registers.pc - i]
         end
       end
     end
