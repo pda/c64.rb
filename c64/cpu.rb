@@ -20,11 +20,11 @@ module C64
     include Instructions
 
     def step
-      registers.pc += 1
       @decoder.decode(memory[registers.pc]).tap do |i|
-        registers.pc += i.operand_size
+        registers.pc += 1
         parameters = [ i.addressing ]
         parameters << read_operand(i) if i.operand?
+        registers.pc += i.operand_size
         send i.name, *parameters
       end
     end
@@ -35,8 +35,8 @@ module C64
 
     def read_operand instruction
       String.new.tap do |operand|
-        (instruction.operand_size - 1).downto(0) do |i|
-          operand << memory[registers.pc - i]
+        instruction.operand_size.times do |i|
+          operand << memory[registers.pc + i]
         end
       end
     end

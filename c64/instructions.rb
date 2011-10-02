@@ -147,12 +147,11 @@ module C64
 
     # jump subroutine
     def JSR addr, op
-      pc_hi = registers.pc >> 8
-      pc_lo = registers.pc & 0xFF
-      memory[registers.sp - 0] = pc_hi
-      memory[registers.sp - 1] = pc_lo
+      ret = registers.pc - 1
+      memory[registers.sp - 0] = ret.high
+      memory[registers.sp - 1] = ret.low
       registers.sp -= 2
-      registers.pc = uint16(op) - 1
+      registers.pc = uint16(op)
     end
 
     # load accumulator
@@ -233,11 +232,10 @@ module C64
 
     # return from subroutine
     def RTS addr
-      ret_lo = memory[registers.sp + 1]
-      ret_hi = memory[registers.sp + 2]
-      ret = (ret_hi << 8) + ret_lo
+      registers.pc.low = memory[registers.sp + 1]
+      registers.pc.high = memory[registers.sp + 2]
       registers.sp += 2
-      registers.pc = ret
+      registers.pc += 1
     end
 
     # subtract with carry

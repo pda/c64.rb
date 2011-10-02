@@ -12,7 +12,7 @@ module C64
     def run_instructions *i
       options = if i.last.is_a? Hash then i.pop else {} end
       offset = options[:at] || 0
-      registers.pc = offset - 1
+      registers.pc = offset
       i.each do |instruction|
         instruction.split(" ").each do |hex|
           memory[offset] = hex.to_i(16)
@@ -25,36 +25,36 @@ module C64
     describe :BEQ do
       it "branches forwards for zero? true" do
         registers.sr = 0b00000010
-        run_instructions "F0 08", at: 0x0400
-        registers.pc.must_equal 0x0409
+        run_instructions "F0 04", at: 0x0400
+        registers.pc.must_equal 0x0406
       end
       it "branches backwards for zero? true" do
         registers.sr = 0b00000010
-        run_instructions "F0 F8", at: 0x0407
+        run_instructions "F0 F8", at: 0x0406
         registers.pc.must_equal 0x0400
       end
       it "does not branch for zero? false" do
         registers.sr = 0b00000000
         run_instructions "F0 08", at: 0x0400
-        registers.pc.must_equal 0x0401
+        registers.pc.must_equal 0x0402
       end
     end
 
     describe :BNE do
       it "branches forwards for zero? false" do
         registers.sr = 0b00000000
-        run_instructions "D0 08", at: 0x0400
-        registers.pc.must_equal 0x0409
+        run_instructions "D0 04", at: 0x0400
+        registers.pc.must_equal 0x0406
       end
       it "branches backwards for zero? false" do
         registers.sr = 0b00000000
-        run_instructions "D0 F8", at: 0x0407
+        run_instructions "D0 F8", at: 0x0406
         registers.pc.must_equal 0x0400
       end
       it "does not branch for zero? true" do
         registers.sr = 0b00000010
         run_instructions "D0 08", at: 0x0400
-        registers.pc.must_equal 0x0401
+        registers.pc.must_equal 0x0402
       end
     end
 
@@ -75,7 +75,7 @@ module C64
     describe :JSR do
       it "stores PC, jumps to address" do
         run_instructions "20 AD DE", at: 1000
-        registers.pc.must_equal 0xDEAD - 1
+        registers.pc.must_equal 0xDEAD
 
         # The return address pushed to the stack by JSR is that of the
         # last byte of the JSR operand (that is, the most significant
@@ -143,7 +143,7 @@ module C64
     describe :NOP do
       it "does nothing" do
         run_instructions "EA"
-        registers.pc.must_equal 0
+        registers.pc.must_equal 1
       end
     end
 
@@ -153,7 +153,7 @@ module C64
         memory[0xDEAD] = 0x60       # RTS
         run_instructions "20 AD DE" # JSR to 0xDEAD
         cpu.step
-        registers.pc.must_equal 0x02
+        registers.pc.must_equal 0x03
         registers.sp.must_equal sp
       end
     end
