@@ -25,7 +25,7 @@ module C64
     end
 
     it "disallows write above bounds" do
-      ->{ mem[mem.size] }.must_raise RuntimeError
+      ->{ mem[mem.size] = 0xFF }.must_raise RuntimeError
     end
 
   end
