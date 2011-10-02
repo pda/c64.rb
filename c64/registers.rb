@@ -1,5 +1,42 @@
+require "c64/data_types"
+
 module C64
-  class Registers < Struct.new(:pc, :ac, :x, :y, :sr, :sp)
+  class Registers
+
+    def initialize pc = 0, ac = 0, x = 0, y = 0, sr = 0, sp = 0
+      @pc = Uint16.new pc
+      @ac = Uint8.new ac
+      @x = Uint8.new x
+      @y = Uint8.new y
+      @sp = Uint8.new sp
+      @sr = sr
+    end
+
+    # register readers
+    def pc; @pc.to_i end
+    def ac; @ac.to_i end
+    def x; @x.to_i end
+    def y; @y.to_i end
+    def sp; @sp.to_i end
+    def sr; @sr end
+
+    # register writers
+    def pc= value; @pc.update value end
+    def ac= value; @ac.update value end
+    def x= value; @x.update value end
+    def y= value; @y.update value end
+    def sp= value; @sp.update value end
+    def sr= value; @sr = value end
+
+    # array-access reader
+    def [] register
+      send register
+    end
+
+    # array-access writer
+    def []= register, value
+      send "#{register}=", value
+    end
 
     class Status
 

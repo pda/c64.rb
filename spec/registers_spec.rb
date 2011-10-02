@@ -3,9 +3,31 @@ require "c64/registers"
 
 module C64
   describe Registers do
+
+    describe "#pc" do
+      it "increments from 0 to 1" do
+        Registers.new(0, 0, 0, 0, 0, 0).tap do |r|
+          r.pc += 1
+          r.pc.must_equal 1
+        end
+      end
+      it "increments from 0xFFFF to 0x0000" do
+        Registers.new(0xFFFF, 0, 0, 0, 0, 0).tap do |r|
+          r.pc += 1
+          r.pc.must_equal 0
+        end
+      end
+    end
+
+    describe "#sp" do
+      it "applies mod 0x100 on initialization" do
+        Registers.new(0, 0, 0, 0, 0, 0x100).sp.must_equal 0
+      end
+    end
+
     describe "#status" do
       def status status
-        Registers.new(nil, nil, nil, nil, status, nil).status
+        Registers.new(0, 0, 0, 0, status, 0).status
       end
 
       describe "for 0b00000000" do
@@ -45,7 +67,7 @@ module C64
       end
 
       it "can set and unset zero? flag" do
-        r = Registers.new(nil, nil, nil, nil, 0b01010101, nil)
+        r = Registers.new(0, 0, 0, 0, 0b01010101, 0)
         r.status.zero?.must_equal false
         r.status.zero = true
         r.status.zero?.must_equal true

@@ -7,7 +7,7 @@ module C64
     def registers; Cpu.new.send(:registers); end
 
     it "initializes program counter to instruction before zero" do
-      registers.pc.must_equal -1
+      registers.pc.must_equal 0xFFFF
     end
 
     it "initializes accumulator to zero" do
