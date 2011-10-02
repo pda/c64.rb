@@ -164,7 +164,7 @@ module C64
     }
 
     def decode input
-      Instruction.new *TABLE[input]
+      Instruction.new *TABLE.fetch(input)
     end
 
   end

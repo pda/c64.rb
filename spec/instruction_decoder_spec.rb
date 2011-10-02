@@ -22,5 +22,9 @@ module C64
       end
     end
 
+    it "raises error for illegal instruction" do
+      ->{ decoder.decode(0x02) }.must_raise KeyError
+    end
+
   end
 end
