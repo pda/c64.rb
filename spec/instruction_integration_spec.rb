@@ -22,6 +22,14 @@ module C64
       i.length.times { cpu.step }
     end
 
+    describe :AND do
+      it "bitwise AND into accumulator" do
+        registers.ac = 0b01010101
+        run_instructions "29 F0" # AND #F0
+        registers.ac.must_equal 0b01010000
+      end
+    end
+
     describe :BEQ do
       it "branches forwards for zero? true" do
         registers.sr = 0b00000010
@@ -58,6 +66,57 @@ module C64
       end
     end
 
+    describe :CLD do
+      it "clears decimal mode" do
+        registers.status.decimal = true
+        run_instructions "D8"
+        registers.status.decimal?.must_equal false
+      end
+    end
+
+    describe :CMP do
+      it "compares memory with accumulator" do
+        registers.sr = 0
+        memory[0xDEAD] = 0x01
+        run_instructions "A9 01", "DD AD DE" # LDA #01, CMP 0x0000,x
+        registers.status.tap do |s|
+          s.zero?.must_equal true
+          s.carry?.must_equal true
+          s.negative?.must_equal false
+        end
+      end
+    end
+
+    describe :DEC do
+      it "decrements memory by one" do
+        memory[0xDEAD] = 0xAA
+        run_instructions "CE AD DE" # DEC #0xDEAD
+        memory[0xDEAD].must_equal 0xA9
+      end
+    end
+
+    describe :DEX do
+      it "decrements x by one" do
+        run_instructions "A2 AA", "CA" # LDX #AA, DEX
+        registers.x.must_equal 0xA9
+      end
+    end
+
+    describe :DEY do
+      it "decrements y by one" do
+        run_instructions "A0 AA", "88" # LDY #AA, DEY
+        registers.y.must_equal 0xA9
+      end
+    end
+
+    describe :INC do
+      it "increments memory by one" do
+        memory[0xDEAD] = 0xAA
+        run_instructions "EE AD DE" # INC #0xDEAD
+        memory[0xDEAD].must_equal 0xAB
+      end
+    end
+
     describe :INX do
       it "increments x by one" do
         run_instructions "E8"
@@ -69,6 +128,13 @@ module C64
       it "increments y by one" do
         run_instructions "C8"
         registers.y.must_equal 1
+      end
+    end
+
+    describe :JMP do
+      it "updates program counter" do
+        run_instructions "4C AD DE" # JMP #0xDEAD
+        registers.pc.must_equal 0xDEAD
       end
     end
 
@@ -147,6 +213,14 @@ module C64
       end
     end
 
+    describe :ORA do
+      it "bitwise OR into accumulator" do
+        registers.ac = 0b01010101
+        run_instructions "09 F0" # AND #F0
+        registers.ac.must_equal 0b11110101
+      end
+    end
+
     describe :RTS do
       it "returns from subroutine, restores stack pointer" do
         sp = registers.sp
@@ -155,6 +229,14 @@ module C64
         cpu.step
         registers.pc.must_equal 0x03
         registers.sp.must_equal sp
+      end
+    end
+
+    describe :SEI do
+      it "sets interrupt disable" do
+        registers.status.interrupt = false
+        run_instructions "78"
+        registers.status.interrupt?.must_equal true
       end
     end
 
@@ -169,6 +251,27 @@ module C64
       it "stores Y into memory (absolute)" do
         run_instructions "A0 AA", "8C AD DE" # LDY, STY
         memory[0xDEAD].must_equal 0xAA
+      end
+    end
+
+    describe :TAX do
+      it "transfers accumulator to X" do
+        run_instructions "A9 AA", "AA" # LDA, TAX
+        registers.x.must_equal 0xAA
+      end
+    end
+
+    describe :TAY do
+      it "transfers accumulator to Y" do
+        run_instructions "A9 AA", "A8" # LDA, TAY
+        registers.y.must_equal 0xAA
+      end
+    end
+
+    describe :TXS do
+      it "transfers X to stack pointer" do
+        run_instructions "A2 AA", "9A" # LDS, TXS
+        registers.sp.must_equal 0xAA
       end
     end
 
