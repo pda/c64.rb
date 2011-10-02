@@ -4,10 +4,12 @@ require "c64/cpu"
 module C64
   describe Cpu do
 
+    def memory; Cpu.new.send(:memory); end
     def registers; Cpu.new.send(:registers); end
 
-    it "initializes program counter to instruction before zero" do
-      registers.pc.must_equal 0xFFFF
+    it "initializes program counter from memory 0xFFFC and 0xFFFD" do
+      cpu = Cpu.new(memory: { 0xFFFC => 0xAA, 0xFFFD => 0xBB })
+      cpu.send(:registers).pc.must_equal 0xBBAA
     end
 
     it "initializes accumulator to zero" do

@@ -6,15 +6,13 @@ require "c64/instructions"
 module C64
   class Cpu
 
-    def initialize
-      @memory = Memory.new
+    def initialize parameters = {}
+      @memory = parameters[:memory] || Memory.new
       @registers = Registers.new.tap do |r|
-        r.pc = -1 # TODO: start at 0xFFFF, where 0xFFFF + 1 == 0x0000
-        r.ac = 0
-        r.x = 0
-        r.y = 0
-        r.sr = 0
+        r.pc.low = memory[0xFFFC]
+        r.pc.high = memory[0xFFFD]
         r.sp = 0xFF
+        r.sr = 0b00000000
       end
       @decoder = InstructionDecoder.new
     end
