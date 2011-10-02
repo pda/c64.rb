@@ -3,30 +3,52 @@ module C64
   # abstract integer, unknown length.
   class Uint
 
+    include Comparable
+
     def initialize value
       update value
     end
 
     def update value
-      @value = value % modulus
+      @value = value.to_i % modulus
     end
 
     def to_i
       @value
     end
 
-    def == other
-      to_i == other
+    def <=> other
+      @value <=> (other % modulus)
+    end
+
+    def zero?
+      @value == 0
     end
 
     def + other
-      @value = (@value + other) % modulus
-      self
+      copy @value + other.to_i
     end
 
     def - other
-      @value = (@value - other) % modulus
-      self
+      copy @value - other.to_i
+    end
+
+    def >> bits
+      copy @value >> bits
+    end
+
+    def << bits
+      copy @value << bits
+    end
+
+    def & other
+      copy @value & other.to_i
+    end
+
+    private
+
+    def copy value
+      self.class.new value
     end
 
   end

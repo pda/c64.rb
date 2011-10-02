@@ -12,6 +12,14 @@ module C64
       (Uint16.new(10) == 20).must_equal false
     end
 
+    it "compares greater than Fixnum" do
+      (Uint8.new(8) > 4).must_equal true
+    end
+
+    it "compares less than Fixnum" do
+      (Uint8.new(8) < 4).must_equal false
+    end
+
     it "is stored mod 0x100" do
       Uint8.new(0x100 * 2 + 4).must_equal 4
     end
