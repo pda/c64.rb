@@ -59,12 +59,18 @@ module C64
 
   # unsigned 8-bit integer.
   class Uint8 < Uint
+    def self.unpack str
+      new(str.unpack("C").first)
+    end
     def modulus; 0x100 end
     def bytes; [ @value ] end
   end
 
   # unsigned 16-bit integer, little-endian.
   class Uint16 < Uint
+    def self.unpack str
+      new(str.unpack("v").first)
+    end
     def modulus; 0x10000 end
     def bytes; [ low, high ] end
     def high; @value >> 8 end
