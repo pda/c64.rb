@@ -45,6 +45,10 @@ module C64
       copy @value & other.to_i
     end
 
+    def | other
+      copy @value | other.to_i
+    end
+
     def inspect
       "#<%s(%d)>" % [ self.class.name, @value ]
     end
