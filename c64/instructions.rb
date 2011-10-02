@@ -149,8 +149,8 @@ module C64
     def JSR addr, op
       pc_hi = registers.pc >> 8
       pc_lo = registers.pc & 0xFF
-      memory[registers.sp - 1] = pc_hi
-      memory[registers.sp - 2] = pc_lo
+      memory[registers.sp - 0] = pc_hi
+      memory[registers.sp - 1] = pc_lo
       registers.sp -= 2
       registers.pc = uint16(op) - 1
     end
@@ -233,8 +233,8 @@ module C64
 
     # return from subroutine
     def RTS addr
-      ret_lo = memory[registers.sp + 0]
-      ret_hi = memory[registers.sp + 1]
+      ret_lo = memory[registers.sp + 1]
+      ret_hi = memory[registers.sp + 2]
       ret = (ret_hi << 8) + ret_lo
       registers.sp += 2
       registers.pc = ret

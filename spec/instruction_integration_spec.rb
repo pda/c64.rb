@@ -101,9 +101,9 @@ module C64
         # the following instruction.
         # http://en.wikipedia.org/wiki/MOS_Technology_6502#Bugs_and_quirks
 
-        # little-endian 0xEA03 == 1002
-        memory[registers.sp + 0].must_equal 0xEA
-        memory[registers.sp + 1].must_equal 0x03
+        # little-endian 0xEB03 == 1003
+        memory[registers.sp + 1].must_equal 0xEB
+        memory[registers.sp + 2].must_equal 0x03
       end
     end
 
