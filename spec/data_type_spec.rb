@@ -59,6 +59,10 @@ module C64
       uint8.respond_to?(:high).must_equal false
       uint8.respond_to?(:low).must_equal false
     end
+
+    it "is inspectable" do
+      Uint8.new(32).inspect.must_equal "#<C64::Uint8(32)>"
+    end
   end
 
   describe Uint16 do
