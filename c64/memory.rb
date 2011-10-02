@@ -1,8 +1,8 @@
 module C64
   class Memory
 
-    def initialize
-      @size = 0x10000
+    def initialize size = 0x10000
+      @size = size
       @bytes = open("/dev/zero") { |f| f.read @size }
     end
 

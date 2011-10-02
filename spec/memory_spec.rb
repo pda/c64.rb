@@ -7,6 +7,14 @@ module C64
 
     def mem; Memory.new; end
 
+    it "defaults to 64k" do
+      Memory.new.size.must_equal 0x10000
+    end
+
+    it "can be created with custom size" do
+      Memory.new(0x100).size.must_equal 0x100
+    end
+
     it "can be written to and read from" do
       m = Memory.new
       m[1024] = 0x88
