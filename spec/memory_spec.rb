@@ -1,5 +1,6 @@
 require_relative "spec_helper"
 require "c64/memory"
+require "c64/data_types"
 
 module C64
   describe Memory do
@@ -10,6 +11,10 @@ module C64
       m = Memory.new
       m[1024] = 0x88
       m[1024].must_equal 0x88
+    end
+
+    it "can be accessed using Uint16" do
+      Memory.new[Uint16.new(0)].must_equal 0
     end
 
     it "disallows read from negative address" do

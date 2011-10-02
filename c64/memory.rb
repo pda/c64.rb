@@ -9,13 +9,15 @@ module C64
     attr_accessor :size
 
     def [] index
-      check_bounds index
-      @bytes[index].unpack("C").first
+      i = index.to_i
+      check_bounds i
+      @bytes[i].unpack("C").first
     end
 
     def []= index, value
-      check_bounds index
-      @bytes[index] = [value].pack("C")
+      i = index.to_i
+      check_bounds i
+      @bytes[i] = [value.to_i].pack("C")
     end
 
     def inspect
