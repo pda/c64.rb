@@ -253,6 +253,22 @@ module C64
       end
     end
 
+    describe :SEC do
+      it "sets carry flag" do
+        status.carry = false
+        run_instructions "38"
+        status.carry?.must_equal true
+      end
+    end
+
+    describe :SED do
+      it "sets decimal flag" do
+        status.decimal = false
+        run_instructions "F8"
+        status.decimal?.must_equal true
+      end
+    end
+
     describe :SEI do
       it "sets interrupt disable" do
         reg.status.interrupt = false
@@ -286,6 +302,16 @@ module C64
       it "transfers accumulator to Y" do
         run_instructions "A9 AA", "A8" # LDA, TAY
         reg.y.must_equal 0xAA
+      end
+    end
+
+    describe :TSX do
+      it "transfers stack pointer to X" do
+        reg.sp = 0xAA
+        run_instructions "BA"
+        reg.x.must_equal 0xAA
+        status.zero?.must_equal false
+        status.negative?.must_equal true
       end
     end
 

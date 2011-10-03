@@ -302,12 +302,12 @@ module C64
 
     # set carry
     def SEC addr
-      raise "TODO"
+      status.carry = true
     end
 
     # set decimal
     def SED addr
-      raise "TODO"
+      status.decimal = true
     end
 
     # set interrupt disable
@@ -357,7 +357,7 @@ module C64
 
     # transfer stack pointer to X
     def TSX addr
-      raise "TODO"
+      reg.x = reg.sp
       set_status_flags reg.x
     end
 
