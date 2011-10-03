@@ -78,7 +78,7 @@ module C64
 
     # clear carry
     def CLC addr
-      raise "TODO"
+      status.carry = false
     end
 
     # clear decimal

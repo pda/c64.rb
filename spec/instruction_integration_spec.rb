@@ -67,6 +67,14 @@ module C64
       end
     end
 
+    describe :CLC do
+      it "clears carry flag" do
+        status.carry = true
+        run_instructions "18"
+        status.carry?.must_equal false
+      end
+    end
+
     describe :CLD do
       it "clears decimal mode" do
         reg.status.decimal = true
