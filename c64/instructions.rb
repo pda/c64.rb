@@ -37,7 +37,7 @@ module C64
     # branch on equal (zero set)
     # (branch on z = 1)
     def BEQ addr, op
-      reg.pc += int8(op) if reg.status.zero?
+      reg.pc += int8(op) if status.zero?
     end
 
     # bit test
@@ -52,7 +52,7 @@ module C64
 
     # branch on not equal (zero clear)
     def BNE addr, op
-      reg.pc += int8(op) unless reg.status.zero?
+      reg.pc += int8(op) unless status.zero?
     end
 
     # branch on plus (negative clear)
@@ -82,7 +82,7 @@ module C64
 
     # clear decimal
     def CLD addr
-      reg.status.decimal = false
+      status.decimal = false
     end
 
     # clear interrupt disable
@@ -205,7 +205,7 @@ module C64
       when :indirect_y then memory[memory[uint16(op) + reg.x]]
       else raise "TODO"
       end
-      reg.status.zero = reg[r].zero?
+      status.zero = reg[r].zero?
     end
     private :LDreg
 
@@ -252,8 +252,8 @@ module C64
     def ROL addr, op = nil
       case addr
       when :accumulator
-        carry = reg.status.carry? ? 1 : 0
-        reg.status.carry = reg.ac >> 7
+        carry = status.carry? ? 1 : 0
+        status.carry = reg.ac >> 7
         reg.ac = (reg.ac << 1) | carry
       else raise "TODO: #{addr}"
       end
@@ -263,8 +263,8 @@ module C64
     def ROR addr, op = nil
       case addr
       when :accumulator
-        carry = reg.status.carry? ? 1 : 0
-        reg.status.carry = reg.ac & 0x01
+        carry = status.carry? ? 1 : 0
+        status.carry = reg.ac & 0x01
         reg.ac = (reg.ac >> 1) | carry << 7
       else raise "TODO: #{addr}"
       end
@@ -300,7 +300,7 @@ module C64
 
     # set interrupt disable
     def SEI addr
-      reg.status.interrupt = true
+      status.interrupt = true
     end
 
     # store accumulator
