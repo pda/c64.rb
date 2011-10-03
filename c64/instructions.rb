@@ -20,7 +20,7 @@ module C64
     end
 
     # arithmetic shift left
-    def ASL addr
+    def ASL addr, op = nil
       raise "TODO"
     end
 
@@ -212,7 +212,7 @@ module C64
     private :LDreg
 
     # logical shift right
-    def LSR addr
+    def LSR addr, op = nil
       raise "TODO"
     end
 
@@ -251,12 +251,12 @@ module C64
     end
 
     # rotate left
-    def ROL addr, op
+    def ROL addr, op = nil
       raise "TODO"
     end
 
     # rotate right
-    def ROR addr
+    def ROR addr, op = nil
       raise "TODO"
     end
 
