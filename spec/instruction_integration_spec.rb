@@ -168,8 +168,8 @@ module C64
     { ac: 0xA5, x: 0xA6, y: 0xA4 }.each do |r, op|
       describe "LD#{r.to_s[0].upcase} zeropage" do
         it "loads zeropage value into #{r} register" do
-          memory[0x10] = 0xAA
-          run_instructions "#{op.to_s(16)} 10"
+          memory[0xC2] = 0xAA
+          run_instructions "#{op.to_s(16)} C2"
           reg[r].must_equal 0xAA
         end
       end

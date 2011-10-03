@@ -205,9 +205,9 @@ module C64
     def LDreg r, addr, op
       reg[r] = case addr
       when :immediate  then op.ord
-      when :zeropage   then memory[int8(op)]
-      when :zeropage_x then memory[int8(op) + reg.x.to_i] # TODO: no .to_i once int8() is Int8 instance
-      when :zeropage_y then memory[int8(op) + reg.y.to_i] # TODO: same
+      when :zeropage   then memory[uint8(op)]
+      when :zeropage_x then memory[uint8(op) + reg.x]
+      when :zeropage_y then memory[uint8(op) + reg.y]
       when :absolute   then memory[uint16(op)]
       when :absolute_x then memory[uint16(op) + reg.x]
       when :indirect_y then memory[memory[uint16(op) + reg.x]]
