@@ -33,6 +33,10 @@ module C64
 
     attr_reader :memory, :registers
 
+    def status
+      registers.status
+    end
+
     def read_operand instruction
       String.new.tap do |operand|
         instruction.operand_size.times do |i|

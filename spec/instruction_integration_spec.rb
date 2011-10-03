@@ -6,6 +6,7 @@ module C64
 
     def cpu; @cpu ||= C64::Cpu.new; end
     def registers; cpu.send :registers; end
+    def status; registers.status; end
     def memory; cpu.send :memory; end
 
     # Usage: run_instructions "AA BB", "CC DD EE", at: 0x400
@@ -221,6 +222,26 @@ module C64
       end
     end
 
+    describe :ROL do
+      it "shifts left one bit, carry into low bit, high bit into carry" do
+        registers.status.carry = false
+        registers.ac = 0b10101010
+        run_instructions "2A"
+        registers.ac.must_equal 0b01010100
+        registers.status.carry?.must_equal true
+      end
+    end
+
+    describe :ROR do
+      it "shifts right one bit, carry into high bit, low bit into carry" do
+        registers.status.carry = true
+        registers.ac = 0b10101010
+        run_instructions "6A"
+        registers.ac.must_equal 0b11010101
+        registers.status.carry?.must_equal false
+      end
+    end
+
     describe :RTS do
       it "returns from subroutine, restores stack pointer" do
         sp = registers.sp
@@ -265,6 +286,36 @@ module C64
       it "transfers accumulator to Y" do
         run_instructions "A9 AA", "A8" # LDA, TAY
         registers.y.must_equal 0xAA
+      end
+    end
+
+    describe :TXA do
+      it "transfers X to accumulator" do
+        run_instructions "A2 AA", "A0 00", "8A" # LDX 0xAA, LDY 0x00, TXA
+        registers.ac.must_equal 0xAA
+        status.zero?.must_equal false
+        status.negative?.must_equal true
+      end
+      it "sets zero flag for zero value" do
+        run_instructions "A2 00", "A0 01", "8A" # LDX 0x00, LDY 0x01, TXA
+        registers.ac.must_equal 0x00
+        status.zero?.must_equal true
+        status.negative?.must_equal false
+      end
+    end
+
+    describe :TYA do
+      it "transfers Y to accumulator" do
+        run_instructions "A0 AA", "A2 00", "98" # LDY 0xAA, LDX 0x00, TYA
+        registers.ac.must_equal 0xAA
+        status.zero?.must_equal false
+        status.negative?.must_equal true
+      end
+      it "sets zero flag for zero value" do
+        run_instructions "A0 00", "A2 01", "98" # LDY 0x00, LDX 0x01, TYA
+        registers.ac.must_equal 0x00
+        status.zero?.must_equal true
+        status.negative?.must_equal false
       end
     end
 

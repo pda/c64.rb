@@ -252,12 +252,26 @@ module C64
 
     # rotate left
     def ROL addr, op = nil
-      raise "TODO"
+      r = registers
+      case addr
+      when :accumulator
+        carry = r.status.carry? ? 1 : 0
+        r.status.carry = r.ac >> 7
+        r.ac = (r.ac << 1) | carry
+      else raise "TODO: #{addr}"
+      end
     end
 
     # rotate right
     def ROR addr, op = nil
-      raise "TODO"
+      r = registers
+      case addr
+      when :accumulator
+        carry = r.status.carry? ? 1 : 0
+        r.status.carry = r.ac & 0x01
+        r.ac = (r.ac >> 1) | carry << 7
+      else raise "TODO: #{addr}"
+      end
     end
 
     # return from interrupt
@@ -338,7 +352,9 @@ module C64
 
     # transfer X to accumulator
     def TXA addr
-      raise "TODO"
+      registers.ac = registers.x
+      status.zero = registers.ac.zero?
+      status.negative = registers.ac >> 7
     end
 
     # transfer X to stack pointer
@@ -348,7 +364,9 @@ module C64
 
     # transfer Y to accumulator
     def TYA addr
-      raise "TODO"
+      registers.ac = registers.y
+      status.zero = registers.ac.zero?
+      status.negative = registers.ac >> 7
     end
 
     private
