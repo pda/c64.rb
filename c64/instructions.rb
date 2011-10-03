@@ -16,12 +16,13 @@ module C64
       else raise "todo: #{addr}"
       end
       reg.ac &= value
-      # todo: set status flags
+      set_status_flags reg.ac
     end
 
     # arithmetic shift left
     def ASL addr, op = nil
       raise "TODO"
+      # TODO: set_status_flags
     end
 
     # branch on carry clear
@@ -125,21 +126,25 @@ module C64
       else raise "TODO: #{addr}"
       end
       memory[address] -= 1
+      set_status_flags memory[address]
     end
 
     # decrement X
     def DEX addr
       reg.x -= 1
+      set_status_flags reg.x
     end
 
     # decrement Y
     def DEY addr
       reg.y -= 1
+      set_status_flags reg.y
     end
 
     # exclusive or (with accumulator)
     def EOR addr, op
       raise "TODO"
+      # TODO: set_status_flags
     end
 
     # increment
@@ -150,16 +155,19 @@ module C64
       else raise "TODO: #{addr}"
       end
       memory[address] += 1
+      set_status_flags memory[address]
     end
 
     # increment X
     def INX addr
       reg.x += 1
+      set_status_flags reg.x
     end
 
     # increment Y
     def INY addr
       reg.y += 1
+      set_status_flags reg.y
     end
 
     # jump
@@ -205,7 +213,7 @@ module C64
       when :indirect_y then memory[memory[uint16(op) + reg.x]]
       else raise "TODO"
       end
-      status.zero = reg[r].zero?
+      set_status_flags reg[r]
     end
     private :LDreg
 
@@ -225,7 +233,7 @@ module C64
       else raise "todo: #{addr}"
       end
       reg.ac |= value
-      # todo: set status flags
+      set_status_flags reg.ac
     end
 
     # push accumulator
@@ -241,6 +249,7 @@ module C64
     # pull accumulator
     def PLA addr
       raise "TODO"
+      # TODO: set_status_flags
     end
 
     # pull processor status (SR)
@@ -255,6 +264,7 @@ module C64
         carry = status.carry? ? 1 : 0
         status.carry = reg.ac >> 7
         reg.ac = (reg.ac << 1) | carry
+        set_status_flags reg.ac
       else raise "TODO: #{addr}"
       end
     end
@@ -266,6 +276,7 @@ module C64
         carry = status.carry? ? 1 : 0
         status.carry = reg.ac & 0x01
         reg.ac = (reg.ac >> 1) | carry << 7
+        set_status_flags reg.ac
       else raise "TODO: #{addr}"
       end
     end
@@ -286,6 +297,7 @@ module C64
     # subtract with carry
     def SBC addr, op
       raise "TODO"
+      set_status_flags reg.ac
     end
 
     # set carry
@@ -334,35 +346,37 @@ module C64
     # transfer accumulator to X
     def TAX addr
       reg.x = reg.ac
+      set_status_flags reg.x
     end
 
     # transfer accumulator to Y
     def TAY addr
       reg.y = reg.ac
+      set_status_flags reg.y
     end
 
     # transfer stack pointer to X
     def TSX addr
       raise "TODO"
+      set_status_flags reg.x
     end
 
     # transfer X to accumulator
     def TXA addr
       reg.ac = reg.x
-      status.zero = reg.ac.zero?
-      status.negative = reg.ac >> 7
+      set_status_flags reg.ac
     end
 
     # transfer X to stack pointer
     def TXS addr
       reg.sp = reg.x
+      set_status_flags reg.sp
     end
 
     # transfer Y to accumulator
     def TYA addr
       reg.ac = reg.y
-      status.zero = reg.ac.zero?
-      status.negative = reg.ac >> 7
+      set_status_flags reg.ac
     end
 
     private
@@ -370,6 +384,11 @@ module C64
     def int8   str; str.unpack("c").first; end
     def uint8  str; Uint8.unpack(str); end
     def uint16 str; Uint16.unpack(str); end
+
+    def set_status_flags value
+      status.zero = value.zero?
+      status.negative = value >> 7
+    end
 
   end
 end
