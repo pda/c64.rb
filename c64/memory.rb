@@ -1,9 +1,10 @@
 module C64
   class Memory
 
-    def initialize size = 0x10000
+    def initialize size = 0x10000, options = {}
       @size = size
-      @bytes = open("/dev/zero") { |f| f.read @size }
+      path = options[:image] || "/dev/zero"
+      @bytes = open(path) { |f| f.read @size }
     end
 
     attr_accessor :size
