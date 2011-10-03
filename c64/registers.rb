@@ -43,6 +43,7 @@ module C64
       FLAGS = {
         negative:  7,
         overflow:  6,
+        # unused:  5,
         break:     4,
         decimal:   3,
         interrupt: 2,
@@ -63,7 +64,7 @@ module C64
           (@registers.sr >> bit & 1) == 1
         end
         define_method "#{flag}=" do |on|
-          if on
+          if on && on != 0
             @registers.sr |= 1 << bit
           else
             @registers.sr &= ~(1 << bit)

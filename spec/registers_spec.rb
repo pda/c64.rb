@@ -76,6 +76,16 @@ module C64
         r.status.to_i.must_equal 0b01010101
       end
 
+      it "can set and unset carry? flag using 0 and 1" do
+        r = Registers.new(0, 0, 0, 0, 0b01010100, 0)
+        r.status.carry?.must_equal false
+        r.status.carry = 1
+        r.status.carry?.must_equal true
+        r.status.carry = 0
+        r.status.carry?.must_equal false
+        r.status.to_i.must_equal 0b01010100
+      end
+
     end
   end
 end
