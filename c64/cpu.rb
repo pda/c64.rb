@@ -32,6 +32,7 @@ module C64
     private
 
     attr_reader :memory, :registers
+    alias :reg :registers
 
     def status
       registers.status

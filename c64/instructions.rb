@@ -15,7 +15,7 @@ module C64
       when :immediate   then uint8(op)
       else raise "todo: #{addr}"
       end
-      registers.ac &= value
+      reg.ac &= value
       # todo: set status flags
     end
 
@@ -37,7 +37,7 @@ module C64
     # branch on equal (zero set)
     # (branch on z = 1)
     def BEQ addr, op
-      registers.pc += int8(op) if registers.status.zero?
+      reg.pc += int8(op) if reg.status.zero?
     end
 
     # bit test
@@ -52,7 +52,7 @@ module C64
 
     # branch on not equal (zero clear)
     def BNE addr, op
-      registers.pc += int8(op) unless registers.status.zero?
+      reg.pc += int8(op) unless reg.status.zero?
     end
 
     # branch on plus (negative clear)
@@ -82,7 +82,7 @@ module C64
 
     # clear decimal
     def CLD addr
-      registers.status.decimal = false
+      reg.status.decimal = false
     end
 
     # clear interrupt disable
@@ -98,15 +98,13 @@ module C64
     # compare (with accumulator)
     def CMP addr, op
       value = case addr
-      when :absolute_x then memory[uint16(op) + registers.x]
-      when :indirect_y then memory[memory[uint16(op) + registers.y]]
+      when :absolute_x then memory[uint16(op) + reg.x]
+      when :indirect_y then memory[memory[uint16(op) + reg.y]]
       else raise "TODO: #{addr}"
       end
-      registers.status.tap do |s|
-        s.zero = registers.ac == value
-        s.carry = registers.ac >= value
-        s.negative = value >> 7 == 1
-      end
+      status.zero = reg.ac == value
+      status.carry = reg.ac >= value
+      status.negative = value >> 7 == 1
     end
 
     # compare with X
@@ -131,12 +129,12 @@ module C64
 
     # decrement X
     def DEX addr
-      registers.x -= 1
+      reg.x -= 1
     end
 
     # decrement Y
     def DEY addr
-      registers.y -= 1
+      reg.y -= 1
     end
 
     # exclusive or (with accumulator)
@@ -156,29 +154,29 @@ module C64
 
     # increment X
     def INX addr
-      registers.x += 1
+      reg.x += 1
     end
 
     # increment Y
     def INY addr
-      registers.y += 1
+      reg.y += 1
     end
 
     # jump
     def JMP addr, op
       case addr
-      when :absolute then registers.pc = uint16(op)
+      when :absolute then reg.pc = uint16(op)
       when :indirect then raise "TODO"
       end
     end
 
     # jump subroutine
     def JSR addr, op
-      ret = registers.pc - 1
-      memory[registers.sp - 0] = ret.high
-      memory[registers.sp - 1] = ret.low
-      registers.sp -= 2
-      registers.pc = uint16(op)
+      ret = reg.pc - 1
+      memory[reg.sp - 0] = ret.high
+      memory[reg.sp - 1] = ret.low
+      reg.sp -= 2
+      reg.pc = uint16(op)
     end
 
     # load accumulator
@@ -196,18 +194,18 @@ module C64
       LDreg :y, addr, op
     end
 
-    def LDreg reg, addr, op
-      registers[reg] = case addr
+    def LDreg r, addr, op
+      reg[r] = case addr
       when :immediate  then op.ord
       when :zeropage   then memory[int8(op)]
-      when :zeropage_x then memory[int8(op) + registers.x.to_i] # TODO: no .to_i once int8() is Int8 instance
-      when :zeropage_y then memory[int8(op) + registers.y.to_i] # TODO: same
+      when :zeropage_x then memory[int8(op) + reg.x.to_i] # TODO: no .to_i once int8() is Int8 instance
+      when :zeropage_y then memory[int8(op) + reg.y.to_i] # TODO: same
       when :absolute   then memory[uint16(op)]
-      when :absolute_x then memory[uint16(op) + registers.x]
-      when :indirect_y then memory[memory[uint16(op) + registers.x]]
+      when :absolute_x then memory[uint16(op) + reg.x]
+      when :indirect_y then memory[memory[uint16(op) + reg.x]]
       else raise "TODO"
       end
-      registers.status.zero = registers[reg].zero?
+      reg.status.zero = reg[r].zero?
     end
     private :LDreg
 
@@ -226,7 +224,7 @@ module C64
       when :immediate   then uint8(op)
       else raise "todo: #{addr}"
       end
-      registers.ac |= value
+      reg.ac |= value
       # todo: set status flags
     end
 
@@ -252,24 +250,22 @@ module C64
 
     # rotate left
     def ROL addr, op = nil
-      r = registers
       case addr
       when :accumulator
-        carry = r.status.carry? ? 1 : 0
-        r.status.carry = r.ac >> 7
-        r.ac = (r.ac << 1) | carry
+        carry = reg.status.carry? ? 1 : 0
+        reg.status.carry = reg.ac >> 7
+        reg.ac = (reg.ac << 1) | carry
       else raise "TODO: #{addr}"
       end
     end
 
     # rotate right
     def ROR addr, op = nil
-      r = registers
       case addr
       when :accumulator
-        carry = r.status.carry? ? 1 : 0
-        r.status.carry = r.ac & 0x01
-        r.ac = (r.ac >> 1) | carry << 7
+        carry = reg.status.carry? ? 1 : 0
+        reg.status.carry = reg.ac & 0x01
+        reg.ac = (reg.ac >> 1) | carry << 7
       else raise "TODO: #{addr}"
       end
     end
@@ -281,10 +277,10 @@ module C64
 
     # return from subroutine
     def RTS addr
-      registers.pc.low = memory[registers.sp + 1]
-      registers.pc.high = memory[registers.sp + 2]
-      registers.sp += 2
-      registers.pc += 1
+      reg.pc.low = memory[reg.sp + 1]
+      reg.pc.high = memory[reg.sp + 2]
+      reg.sp += 2
+      reg.pc += 1
     end
 
     # subtract with carry
@@ -304,7 +300,7 @@ module C64
 
     # set interrupt disable
     def SEI addr
-      registers.status.interrupt = true
+      reg.status.interrupt = true
     end
 
     # store accumulator
@@ -322,27 +318,27 @@ module C64
       STreg :y, addr, op
     end
 
-    def STreg reg, addr, op
+    def STreg r, addr, op
       address = case addr
       when :absolute   then uint16(op)
-      when :absolute_x then uint16(op) + registers.x
-      when :absolute_y then uint16(op) + registers.y
-      when :indirect_y then memory[uint16(op) + registers.y]
+      when :absolute_x then uint16(op) + reg.x
+      when :absolute_y then uint16(op) + reg.y
+      when :indirect_y then memory[uint16(op) + reg.y]
       when :zeropage   then uint8(op)
       else raise "TODO: #{addr}"
       end
-      memory[address] = registers[reg]
+      memory[address] = reg[r]
     end
     private :STreg
 
     # transfer accumulator to X
     def TAX addr
-      registers.x = registers.ac
+      reg.x = reg.ac
     end
 
     # transfer accumulator to Y
     def TAY addr
-      registers.y = registers.ac
+      reg.y = reg.ac
     end
 
     # transfer stack pointer to X
@@ -352,21 +348,21 @@ module C64
 
     # transfer X to accumulator
     def TXA addr
-      registers.ac = registers.x
-      status.zero = registers.ac.zero?
-      status.negative = registers.ac >> 7
+      reg.ac = reg.x
+      status.zero = reg.ac.zero?
+      status.negative = reg.ac >> 7
     end
 
     # transfer X to stack pointer
     def TXS addr
-      registers.sp = registers.x
+      reg.sp = reg.x
     end
 
     # transfer Y to accumulator
     def TYA addr
-      registers.ac = registers.y
-      status.zero = registers.ac.zero?
-      status.negative = registers.ac >> 7
+      reg.ac = reg.y
+      status.zero = reg.ac.zero?
+      status.negative = reg.ac >> 7
     end
 
     private
