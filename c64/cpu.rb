@@ -11,7 +11,7 @@ module C64
       @registers = Registers.new.tap do |r|
         r.pc.low = memory[0xFFFC]
         r.pc.high = memory[0xFFFD]
-        r.sp = 0xFF
+        r.sp = 0xFF # address within second page of memory (0x0100 ~ 0x01FF)
         r.sr = 0b00000000
       end
       @decoder = InstructionDecoder.new

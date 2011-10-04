@@ -181,8 +181,8 @@ module C64
     # jump subroutine
     def JSR addr, op
       ret = reg.pc - 1
-      memory[reg.sp - 0] = ret.high
-      memory[reg.sp - 1] = ret.low
+      memory[stack_head] = ret.high
+      memory[stack_head(-1)] = ret.low
       reg.sp -= 2
       reg.pc = uint16(op)
     end
@@ -288,8 +288,8 @@ module C64
 
     # return from subroutine
     def RTS addr
-      reg.pc.low = memory[reg.sp + 1]
-      reg.pc.high = memory[reg.sp + 2]
+      reg.pc.low = memory[stack_head 1]
+      reg.pc.high = memory[stack_head 2]
       reg.sp += 2
       reg.pc += 1
     end
@@ -388,6 +388,10 @@ module C64
     def set_status_flags value
       status.zero = value.zero?
       status.negative = value >> 7
+    end
+
+    def stack_head offset = 0
+      Uint16.new(0x0100) + (reg.sp + offset)
     end
 
   end

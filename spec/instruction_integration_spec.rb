@@ -159,8 +159,8 @@ module C64
         # http://en.wikipedia.org/wiki/MOS_Technology_6502#Bugs_and_quirks
 
         # little-endian 0xEA03 == 1002
-        memory[reg.sp + 1].must_equal 0xEA
-        memory[reg.sp + 2].must_equal 0x03
+        memory[0x01FE].must_equal 0xEA # "top" of stack
+        memory[0x01FF].must_equal 0x03 # second-to-"top" of stack
       end
     end
 
