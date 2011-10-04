@@ -11,11 +11,7 @@ module C64
 
     # and (with accumulator)
     def AND addr, op
-      value = case addr
-      when :immediate   then uint8(op)
-      else raise "todo: #{addr}"
-      end
-      reg.ac &= value
+      reg.ac &= memory_read(addr, op)
       set_status_flags reg.ac
     end
 
@@ -98,14 +94,9 @@ module C64
 
     # compare (with accumulator)
     def CMP addr, op
-      value = case addr
-      when :absolute_x then memory[uint16(op) + reg.x]
-      when :indirect_y then memory[memory[uint16(op) + reg.y]]
-      else raise "TODO: #{addr}"
-      end
-      status.zero = reg.ac == value
+      value = memory_read(addr, op)
       status.carry = reg.ac >= value
-      status.negative = value >> 7 == 1
+      set_status_flags (reg.ac - value)
     end
 
     # compare with X
@@ -120,11 +111,7 @@ module C64
 
     # decrement
     def DEC addr, op
-      address = case addr
-      when :zeropage   then uint8(op)
-      when :absolute   then uint16(op)
-      else raise "TODO: #{addr}"
-      end
+      address = memory_address(addr, op)
       memory[address] -= 1
       set_status_flags memory[address]
     end
@@ -149,11 +136,7 @@ module C64
 
     # increment
     def INC addr, op
-      address = case addr
-      when :zeropage   then uint8(op)
-      when :absolute   then uint16(op)
-      else raise "TODO: #{addr}"
-      end
+      address = memory_address(addr, op)
       memory[address] += 1
       set_status_flags memory[address]
     end
@@ -172,10 +155,7 @@ module C64
 
     # jump
     def JMP addr, op
-      case addr
-      when :absolute then reg.pc = uint16(op)
-      when :indirect then raise "TODO"
-      end
+      reg.pc = memory_address(addr, op)
     end
 
     # jump subroutine
@@ -202,18 +182,9 @@ module C64
       LDreg :y, addr, op
     end
 
+    # implementation for LDA, LDX, LDY
     def LDreg r, addr, op
-      reg[r] = case addr
-      when :immediate  then op.ord
-      when :zeropage   then memory[uint8(op)]
-      when :zeropage_x then memory[uint8(op) + reg.x]
-      when :zeropage_y then memory[uint8(op) + reg.y]
-      when :absolute   then memory[uint16(op)]
-      when :absolute_x then memory[uint16(op) + reg.x]
-      when :absolute_y then memory[uint16(op) + reg.y]
-      when :indirect_y then memory[memory[uint16(op) + reg.x]]
-      else raise "TODO: #{addr}"
-      end
+      reg[r] = memory_read(addr, op)
       set_status_flags reg[r]
     end
     private :LDreg
@@ -229,11 +200,7 @@ module C64
 
     # or with accumulator
     def ORA addr, op
-      value = case addr
-      when :immediate   then uint8(op)
-      else raise "todo: #{addr}"
-      end
-      reg.ac |= value
+      reg.ac |= memory_read(addr, op)
       set_status_flags reg.ac
     end
 
@@ -331,16 +298,9 @@ module C64
       STreg :y, addr, op
     end
 
+    # implementation for STA, STX, STY
     def STreg r, addr, op
-      address = case addr
-      when :absolute   then uint16(op)
-      when :absolute_x then uint16(op) + reg.x
-      when :absolute_y then uint16(op) + reg.y
-      when :indirect_y then memory[uint16(op) + reg.y]
-      when :zeropage   then uint8(op)
-      else raise "TODO: #{addr}"
-      end
-      memory[address] = reg[r]
+      memory_write(addr, op, reg[r])
     end
     private :STreg
 
@@ -393,6 +353,33 @@ module C64
 
     def stack_head offset = 0
       Uint16.new(0x0100) + (reg.sp + offset)
+    end
+
+    def memory_address mode, op
+      case mode
+      when :absolute then uint16(op)
+      when :absolute_x then uint16(op) + reg.x
+      when :absolute_y then uint16(op) + reg.y
+      when :indirect then memory[uint16(op)]
+      when :indirect_x then memory[uint16(op) + reg.x]
+      when :indirect_y then memory[uint16(op) + reg.y]
+      when :relative then reg.pc + int8(op)
+      when :zeropage then uint8(op)
+      when :zeropage_x then uint8(op) + reg.x
+      when :zeropage_y then uint8(op) + reg.y
+      else raise "memory_address not valid for #{mode} mode"
+      end
+    end
+
+    def memory_read mode, operand
+      case mode
+      when :immediate then uint8(operand)
+      else memory[memory_address(mode, operand)]
+      end
+    end
+
+    def memory_write mode, operand, value
+      memory[memory_address(mode, operand)] = value
     end
 
   end
