@@ -210,8 +210,9 @@ module C64
       when :zeropage_y then memory[uint8(op) + reg.y]
       when :absolute   then memory[uint16(op)]
       when :absolute_x then memory[uint16(op) + reg.x]
+      when :absolute_y then memory[uint16(op) + reg.y]
       when :indirect_y then memory[memory[uint16(op) + reg.x]]
-      else raise "TODO"
+      else raise "TODO: #{addr}"
       end
       set_status_flags reg[r]
     end
