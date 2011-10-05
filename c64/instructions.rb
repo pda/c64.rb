@@ -89,7 +89,7 @@ module C64
 
     # clear overflow
     def CLV addr
-      raise "TODO"
+      status.overflow = false
     end
 
     # compare (with accumulator)

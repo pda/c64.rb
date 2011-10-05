@@ -161,6 +161,14 @@ module C64
       end
     end
 
+    describe :CLV do
+      it "clears overflow flag" do
+        reg.status.overflow = true
+        run_instructions "B8"
+        reg.status.overflow?.must_equal false
+      end
+    end
+
     describe :CMP do
       it "compares memory with accumulator" do
         reg.sr = 0
