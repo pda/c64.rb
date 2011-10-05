@@ -15,7 +15,14 @@ module C64
         r.sr = 0b00000000
       end
       @decoder = InstructionDecoder.new
+
+      # counters
+      @cycles = 0
+      @instructions = 0
     end
+
+    # counters
+    attr_reader :cycles, :instructions
 
     include Instructions
 
@@ -26,6 +33,8 @@ module C64
         parameters << read_operand(i) if i.operand?
         registers.pc += i.operand_size
         send i.name, *parameters
+        @cycles += i.cycles
+        @instructions += 1
       end
     end
 
