@@ -1,22 +1,42 @@
 #!env ruby
 $LOAD_PATH.unshift "."
 require "c64/cpu"
+require "c64/memory"
+require "c64/memory_overlay"
 
-cpu = C64::Cpu.new
+module C64
 
-cpu.instance_variable_get(:@memory).tap do |m|
-  m[0] = 0xEA # NOP
-  m[1] = 0xA2 # LDX imm
-  m[2] = 111  # arbitrary byte
-  m[3] = 0xA0 # LDY imm
-  m[4] = 222  # arbitrary byte
+  ram =    Memory.new(0x10000) # 64k
+  kernal = Memory.new(0x2000, image: "rom/kernal.rom") # 8k
+  char =   Memory.new(0x1000, image: "rom/character.rom") # 4k
+  basic =  Memory.new(0x2000, image: "rom/basic.rom") # 8k
+
+  memory = MemoryOverlay.new(
+    MemoryOverlay.new(
+      MemoryOverlay.new(
+        ram,
+        kernal,
+        0xE000
+      ),
+      char,
+      0xD000
+    ),
+    basic,
+    0xA000
+  )
+
+  cpu = Cpu.new memory: memory
+
+  begin
+    loop { cpu.step }
+  ensure
+    puts
+    p cpu
+    puts
+    puts "Instructions: #{cpu.instructions}"
+    puts "Cycles: #{cpu.cycles}"
+    puts "Simulated seconds: #{cpu.cycles.to_f / 1000}"
+    puts
+  end
+
 end
-
-cpu.instance_variable_get(:@registers).tap do |r|
-  r.pc = 0    # program counter
-end
-
-cpu.step
-cpu.step
-cpu.step
-p cpu
