@@ -23,18 +23,18 @@ module C64
 
     # branch on carry clear
     def BCC addr, op
-      raise "TODO"
+      branch(op) unless status.carry?
     end
 
     # branch on carry set
     def BCS addr, op
-      raise "TODO"
+      branch(op) if status.carry?
     end
 
     # branch on equal (zero set)
     # (branch on z = 1)
     def BEQ addr, op
-      reg.pc += int8(op) if status.zero?
+      branch(op) if status.zero?
     end
 
     # bit test
@@ -44,17 +44,17 @@ module C64
 
     # branch on minus (negative set)
     def BMI addr, op
-      raise "TODO"
+      branch(op) if status.negative?
     end
 
     # branch on not equal (zero clear)
     def BNE addr, op
-      reg.pc += int8(op) unless status.zero?
+      branch(op) unless status.zero?
     end
 
     # branch on plus (negative clear)
     def BPL addr, op
-      raise "TODO"
+      branch(op) unless status.negative?
     end
 
     # interrupt
@@ -64,12 +64,12 @@ module C64
 
     # branch on overflow clear
     def BVC addr, op
-      raise "TODO"
+      branch(op) unless status.overflow?
     end
 
     # branch on overflow set
     def BVS addr, op
-      raise "TODO"
+      branch(op) if status.overflow?
     end
 
     # clear carry
@@ -380,6 +380,10 @@ module C64
 
     def memory_write mode, operand, value
       memory[memory_address(mode, operand)] = value
+    end
+
+    def branch op
+      reg.pc += int8(op)
     end
 
   end

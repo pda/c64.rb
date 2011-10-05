@@ -31,6 +31,32 @@ module C64
       end
     end
 
+    describe :BCC do
+      it "branches for carry? false" do
+        status.carry = false
+        run_instructions "90 04"
+        reg.pc.must_equal 0x0006
+      end
+      it "does not branch for carry? true" do
+        status.carry = true
+        run_instructions "90 04"
+        reg.pc.must_equal 0x0002
+      end
+    end
+
+    describe :BCS do
+      it "branches for carry? true" do
+        status.carry = true
+        run_instructions "B0 04"
+        reg.pc.must_equal 0x0006
+      end
+      it "does not branch for carry? false" do
+        status.carry = false
+        run_instructions "B0 04"
+        reg.pc.must_equal 0x0002
+      end
+    end
+
     describe :BEQ do
       it "branches forwards for zero? true" do
         reg.sr = 0b00000010
@@ -49,6 +75,19 @@ module C64
       end
     end
 
+    describe :BMI do
+      it "branches for negative? true" do
+        status.negative = true
+        run_instructions "30 04"
+        reg.pc.must_equal 0x0006
+      end
+      it "does not branch for negative? false" do
+        status.negative = false
+        run_instructions "30 04"
+        reg.pc.must_equal 0x0002
+      end
+    end
+
     describe :BNE do
       it "branches forwards for zero? false" do
         reg.sr = 0b00000000
@@ -64,6 +103,45 @@ module C64
         reg.sr = 0b00000010
         run_instructions "D0 08", at: 0x0400
         reg.pc.must_equal 0x0402
+      end
+    end
+
+    describe :BPL do
+      it "branches for negative? false" do
+        status.negative = false
+        run_instructions "10 04"
+        reg.pc.must_equal 0x0006
+      end
+      it "does not branch for negative? true" do
+        status.negative = true
+        run_instructions "10 04"
+        reg.pc.must_equal 0x0002
+      end
+    end
+
+    describe :BVC do
+      it "branches for overflow? false" do
+        status.overflow = false
+        run_instructions "50 04"
+        reg.pc.must_equal 0x0006
+      end
+      it "does not branch for overflow? true" do
+        status.overflow = true
+        run_instructions "50 04"
+        reg.pc.must_equal 0x0002
+      end
+    end
+
+    describe :BVS do
+      it "branches for overflow? true" do
+        status.overflow = true
+        run_instructions "70 04"
+        reg.pc.must_equal 0x0006
+      end
+      it "does not branch for overflow? false" do
+        status.overflow = false
+        run_instructions "70 04"
+        reg.pc.must_equal 0x0002
       end
     end
 

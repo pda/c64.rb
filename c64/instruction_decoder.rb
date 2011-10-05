@@ -41,7 +41,7 @@ module C64
       0x10 => [ :BPL, :relative, 2, 2, :b ],
       0x00 => [ :BRK, :implied, 1, 7, nil ],
       0x50 => [ :BVC, :relative, 2, 2, :b ],
-      0x70 => [ :BVC, :relative, 2, 2, :b ],
+      0x70 => [ :BVS, :relative, 2, 2, :b ],
       0x18 => [ :CLC, :implied, 1, 2, nil ],
       0xD8 => [ :CLD, :implied, 1, 2, nil ],
       0x58 => [ :CLI, :implied, 1, 2, nil ],
