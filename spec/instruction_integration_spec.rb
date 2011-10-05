@@ -75,6 +75,27 @@ module C64
       end
     end
 
+    describe :BIT do
+      it "loads negative and overflow flags, sets zero based on ac AND op" do
+        reg.sr = 0b00000000
+        reg.ac = 0b00101010
+        memory[0x00A0] = 0b11010101
+        run_instructions "24 A0"
+        status.negative?.must_equal true
+        status.overflow?.must_equal true
+        status.zero?.must_equal true # reg.ac AND [0x00A0] == 0
+      end
+      it "loads negative and overflow flags (unset), unsets zero based on ac AND op" do
+        reg.sr = 0b11111111
+        reg.ac = 0b11111111
+        memory[0x00A0] = 0b00010101
+        run_instructions "24 A0"
+        status.negative?.must_equal false
+        status.overflow?.must_equal false
+        status.zero?.must_equal false # reg.ac AND [0x00A0] != 0
+      end
+    end
+
     describe :BMI do
       it "branches for negative? true" do
         status.negative = true

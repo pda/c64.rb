@@ -39,7 +39,9 @@ module C64
 
     # bit test
     def BIT addr, op
-      raise "TODO"
+      value = memory_read(addr, op)
+      reg.sr = (reg.sr & 0b00111111) + (value & 0b11000000)
+      status.zero = (reg.ac & value == 0x00)
     end
 
     # branch on minus (negative set)
