@@ -31,7 +31,7 @@ module C64
       end
 
       describe "for 0b00000000" do
-        it "answers false for all flags" do
+        it "answers false for all flag predicates" do
           status(0b00000000).tap do |s|
             s.negative?.must_equal false
             s.overflow?.must_equal false
@@ -40,6 +40,42 @@ module C64
             s.interrupt?.must_equal false
             s.zero?.must_equal false
             s.carry?.must_equal false
+          end
+        end
+        it "answers zero for all flags" do
+          status(0b00000000).tap do |s|
+            s.negative.must_equal 0
+            s.overflow.must_equal 0
+            s.break.must_equal 0
+            s.decimal.must_equal 0
+            s.interrupt.must_equal 0
+            s.zero.must_equal 0
+            s.carry.must_equal 0
+          end
+        end
+      end
+
+      describe "for 0b11111111" do
+        it "answers true for all flag predicates" do
+          status(0b11111111).tap do |s|
+            s.negative?.must_equal true
+            s.overflow?.must_equal true
+            s.break?.must_equal true
+            s.decimal?.must_equal true
+            s.interrupt?.must_equal true
+            s.zero?.must_equal true
+            s.carry?.must_equal true
+          end
+        end
+        it "answers one for all flags" do
+          status(0b11111111).tap do |s|
+            s.negative.must_equal 1
+            s.overflow.must_equal 1
+            s.break.must_equal 1
+            s.decimal.must_equal 1
+            s.interrupt.must_equal 1
+            s.zero.must_equal 1
+            s.carry.must_equal 1
           end
         end
       end

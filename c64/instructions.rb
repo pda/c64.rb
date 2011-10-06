@@ -231,7 +231,7 @@ module C64
     def ROL addr, op = nil
       case addr
       when :accumulator
-        carry = status.carry? ? 1 : 0
+        carry = status.carry
         status.carry = reg.ac >> 7
         reg.ac = (reg.ac << 1) | carry
         set_status_flags reg.ac
@@ -243,7 +243,7 @@ module C64
     def ROR addr, op = nil
       case addr
       when :accumulator
-        carry = status.carry? ? 1 : 0
+        carry = status.carry
         status.carry = reg.ac & 0x01
         reg.ac = (reg.ac >> 1) | carry << 7
         set_status_flags reg.ac

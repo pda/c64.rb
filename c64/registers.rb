@@ -60,8 +60,11 @@ module C64
       end
 
       FLAGS.each do |flag, bit|
+        define_method flag do
+          @registers.sr >> bit & 1
+        end
         define_method "#{flag}?" do
-          (@registers.sr >> bit & 1) == 1
+          send(flag) == 1
         end
         define_method "#{flag}=" do |on|
           if on && on != 0
