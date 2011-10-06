@@ -277,6 +277,7 @@ module C64
 
     # set decimal
     def SED addr
+      raise "ATTEMPT TO ENTER DECIMAL MODE"
       status.decimal = true
     end
 
