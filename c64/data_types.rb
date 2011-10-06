@@ -10,7 +10,7 @@ module C64
     end
 
     def update value
-      @value = value.to_i % modulus
+      @value = value.to_i & mask
     end
 
     def to_i
@@ -18,7 +18,7 @@ module C64
     end
 
     def <=> other
-      @value <=> (other % modulus)
+      @value <=> (other.to_i & mask)
     end
 
     def zero?
@@ -66,7 +66,7 @@ module C64
     def self.unpack str
       new(str.unpack("C").first)
     end
-    def modulus; 0x100 end
+    def mask; 0xFF end
     def bytes; [ @value ] end
   end
 
@@ -75,7 +75,7 @@ module C64
     def self.unpack str
       new(str.unpack("v").first)
     end
-    def modulus; 0x10000 end
+    def mask; 0xFFFF end
     def bytes; [ low, high ] end
     def high; @value >> 8 end
     def low; @value & 0xFF end
