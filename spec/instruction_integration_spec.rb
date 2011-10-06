@@ -194,7 +194,33 @@ module C64
       it "compares memory with accumulator" do
         reg.sr = 0
         memory[0xDEAD] = 0x01
-        run_instructions "A9 01", "DD AD DE" # LDA #01, CMP 0x0000,x
+        run_instructions "A9 01", "DD AD DE" # LDA #01, CMP 0xDEAD,x
+        reg.status.tap do |s|
+          s.zero?.must_equal true
+          s.carry?.must_equal true
+          s.negative?.must_equal false
+        end
+      end
+    end
+
+    describe :CPX do
+      it "compares memory with x" do
+        reg.sr = 0
+        memory[0xDEAD] = 0x01
+        run_instructions "A2 01", "EC AD DE" # LDX #01, CPX 0xDEAD
+        reg.status.tap do |s|
+          s.zero?.must_equal true
+          s.carry?.must_equal true
+          s.negative?.must_equal false
+        end
+      end
+    end
+
+    describe :CPY do
+      it "compares memory with y" do
+        reg.sr = 0
+        memory[0xDEAD] = 0x01
+        run_instructions "A0 01", "CC AD DE" # LDY #01, CPY 0xDEAD
         reg.status.tap do |s|
           s.zero?.must_equal true
           s.carry?.must_equal true

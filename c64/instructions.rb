@@ -103,12 +103,16 @@ module C64
 
     # compare with X
     def CPX addr, op
-      raise "TODO"
+      value = memory_read(addr, op)
+      status.carry = reg.x >= value
+      set_status_flags (reg.x - value)
     end
 
     # compare with Y
     def CPY addr, op
-      raise "TODO"
+      value = memory_read(addr, op)
+      status.carry = reg.y >= value
+      set_status_flags (reg.y - value)
     end
 
     # decrement
