@@ -50,7 +50,7 @@ module C64
     end
 
     def inspect
-      "#<%s(%d)>" % [ self.class.name, @value ]
+      "%s(%d)" % [ self.class.name, @value ]
     end
 
     private

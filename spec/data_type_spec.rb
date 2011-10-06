@@ -61,7 +61,7 @@ module C64
     end
 
     it "is inspectable" do
-      Uint8.new(32).inspect.must_equal "#<C64::Uint8(32)>"
+      Uint8.new(32).inspect.must_equal "C64::Uint8(32)"
     end
 
     it "unpacks from String" do
