@@ -50,6 +50,10 @@ module C64
       (Uint8.new(0) - 1).must_equal 0xFF
     end
 
+    it "flips bits for bitwise NOT" do
+      (~Uint8.new(0b00110011)).must_equal 0b11001100
+    end
+
     it "exposes bytes" do
       Uint8.new(0xDD).bytes.must_equal [ 0xDD ]
     end
