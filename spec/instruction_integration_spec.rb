@@ -23,6 +23,52 @@ module C64
       i.length.times { cpu.step }
     end
 
+    describe "behaviour described at http://www.6502.org/tutorials/vflag.html section 2.4.2.2" do
+      def carry_and_overflow_must_equal c, v
+        status.carry?.must_equal c
+        status.overflow?.must_equal v
+      end
+      it "is correct for 1 + 1 = 2" do
+        run_instructions "18", "A9 01", "69 01" # CLC; LDA; ADC
+        carry_and_overflow_must_equal false, false
+      end
+      it "is correct for 1 + -1 = 0" do
+        run_instructions "18", "A9 01", "69 FF" # CLC; LDA; ADC
+        carry_and_overflow_must_equal true, false
+      end
+      it "is correct for 127 + 1 = 128" do
+        run_instructions "18", "A9 7F", "69 01" # CLC; LDA; ADC
+        carry_and_overflow_must_equal false, true
+      end
+      it "is correct for -128 + -1 = -129" do
+        run_instructions "18", "A9 80", "69 FF" # CLC; LDA; ADC
+        carry_and_overflow_must_equal true, true
+      end
+
+      it "is correct for 0 - 1 = -1" do
+        run_instructions "38", "A9 00", "E9 01" # SEC; LDA; SBC
+        status.overflow?.must_equal false
+      end
+      it "is correct for -128 - 1 = -129" do
+        run_instructions "38", "A9 80", "E9 01" # SEC; LDA; SBC
+        status.overflow?.must_equal true
+      end
+      it "is correct for 127 - -1 = 128" do
+        run_instructions "38", "A9 7F", "E9 FF" # SEC; LDA; SBC
+        reg.ac.must_equal 0x80
+        status.overflow?.must_equal true
+      end
+
+      it "is correct for 63 + 64 + 1 = 128" do
+        run_instructions "38", "A9 3F", "69 40" # SEC; LDA; ADC
+        status.overflow?.must_equal true
+      end
+      it "is correct for -64 - 64 - 1 = -129" do
+        run_instructions "18", "A9 C0", "E9 40" # CLC; LDA; SBC
+        status.overflow?.must_equal true
+      end
+    end
+
     describe :ADC do
       describe "in binary mode, with 0xA4 in accumulator" do
         before do
