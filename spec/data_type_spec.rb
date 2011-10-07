@@ -67,6 +67,14 @@ module C64
     it "unpacks from String" do
       Uint8.unpack("\xAA").must_equal 0xAA
     end
+
+    it "converts to positive signed integer" do
+      Uint8.new(8).to_signed.must_equal 8
+    end
+
+    it "converts to negative signed integer" do
+      Uint8.new(256 - 8).to_signed.must_equal -8
+    end
   end
 
   describe Uint16 do

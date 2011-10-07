@@ -17,6 +17,14 @@ module C64
       @value
     end
 
+    def to_signed
+      if @value < (mask + 1) / 2
+        @value
+      else
+        -1 * (mask + 1 - @value)
+      end
+    end
+
     def <=> other
       @value <=> (other.to_i & mask)
     end
