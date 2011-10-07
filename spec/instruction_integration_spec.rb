@@ -23,6 +23,41 @@ module C64
       i.length.times { cpu.step }
     end
 
+    describe :ADC do
+      describe "in binary mode, with 0xA4 in accumulator" do
+        before do
+          status.decimal = false
+          reg.ac = 0xA4
+        end
+        describe "with carry not set" do
+          before { status.carry = false }
+          it "adds 0x04 = 0xA8 (clears carry)" do
+            run_instructions "69 04"
+            reg.ac.must_equal 0xA8
+            status.carry?.must_equal false
+          end
+          it "adds 0xA0 = 0x44 (sets carry)" do
+            run_instructions "69 A0"
+            reg.ac.must_equal 0x44
+            status.carry?.must_equal true
+          end
+        end
+        describe "with carry set" do
+          before { status.carry = true }
+          it "adds 0x04 = 0xA9 (clears carry)" do
+            run_instructions "69 04"
+            reg.ac.must_equal 0xA9
+            status.carry?.must_equal false
+          end
+          it "adds 0xA0 = 0x45 (sets carry)" do
+            run_instructions "69 A0"
+            reg.ac.must_equal 0x45
+            status.carry?.must_equal true
+          end
+        end
+      end
+    end
+
     describe :AND do
       it "bitwise AND into accumulator" do
         reg.ac = 0b01010101
@@ -391,6 +426,41 @@ module C64
         cpu.step
         reg.pc.must_equal 0x03
         reg.sp.must_equal sp
+      end
+    end
+
+    describe :SBC do
+      describe "in binary mode, with 0x08 in accumulator" do
+        before do
+          status.decimal = false
+          reg.ac = 0x08
+        end
+        describe "with carry not set" do
+          before { status.carry = false }
+          it "subtracts 0x04 = 0x04 (sets carry)" do
+            run_instructions "E9 04"
+            reg.ac.must_equal 0x03
+            status.carry?.must_equal true
+          end
+          it "subtracts 0x10 = 0xF4 (clears carry)" do
+            run_instructions "E9 10"
+            reg.ac.must_equal 0xF7
+            status.carry?.must_equal false
+          end
+        end
+        describe "with carry set" do
+          before { status.carry = true }
+          it "subtracts 0x04 = 0x03 (sets carry)" do
+            run_instructions "E9 04"
+            reg.ac.must_equal 0x04
+            status.carry?.must_equal true
+          end
+          it "subtracts 0x10 = 0xF3 (clears carry)" do
+            run_instructions "E9 10"
+            reg.ac.must_equal 0xF8
+            status.carry?.must_equal false
+          end
+        end
       end
     end
 

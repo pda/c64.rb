@@ -6,7 +6,21 @@ module C64
 
     # add with carry
     def ADC addr, op
-      raise "TODO"
+      if status.decimal?
+        raise "ADC: binary-coded-decimal mode not supported"
+        # TODO: set carry
+        # TODO: set overflow
+      else
+        o = memory_read(addr, op).to_i
+        result = reg.ac.to_i + o + status.carry
+        result_signed = reg.ac.to_signed + Uint8.new(o).to_signed + status.carry
+
+        status.carry = (result > 255)
+        status.overflow = (result_signed < -128 || result_signed > 127)
+
+        reg.ac = result
+      end
+      set_status_flags reg.ac
     end
 
     # and (with accumulator)
@@ -270,7 +284,19 @@ module C64
 
     # subtract with carry
     def SBC addr, op
-      raise "TODO"
+      if status.decimal?
+        raise "SBC: binary-coded-decimal mode not supported"
+      else
+        carry = status.carry? ? 0 : 1
+        o = memory_read(addr, op).to_i
+        result = reg.ac.to_i - o - carry
+        result_signed = reg.ac.to_signed - Uint8.new(o).to_signed - carry
+
+        status.carry = (result > 0)
+        status.overflow = (result_signed < -128 || result_signed > 127)
+
+        reg.ac = result
+      end
       set_status_flags reg.ac
     end
 
