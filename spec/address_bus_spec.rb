@@ -16,14 +16,18 @@ module C64
       at = parameters[:at] || address
       if bank = parameters[:reads]
         it "reads 0x#{"%4X" % address} from #{bank} at 0x#{"%04X" % at}" do
-          banks[parameters[:reads]].expect :[], 0xAA, [at]
+          bank = banks[parameters[:reads]]
+          bank.expect :[], 0xAA, [at]
           bus[address].must_equal 0xAA
+          bank.verify
         end
       end
       if bank = parameters[:writes]
         it "writes 0x#{"%04X" % address} to #{bank} at 0x#{"%04X" % at}" do
-          banks[parameters[:writes]].expect :[]=, nil, [at, 0xBB]
+          bank = banks[parameters[:writes]]
+          bank.expect :[]=, nil, [at, 0xBB]
           bus[address] = 0xBB
+          bank.verify
         end
       end
     end
