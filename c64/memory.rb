@@ -5,6 +5,7 @@ module C64
       @size = size
       path = options[:image] || "/dev/zero"
       @bytes = open(path) { |f| f.read @size }
+      @tag = options[:tag]
     end
 
     attr_accessor :size
@@ -12,20 +13,25 @@ module C64
     def [] index
       i = index.to_i
       check_bounds i
-      @bytes[i].unpack("C").first
+      value = @bytes[i].unpack("C").first
+      puts "#{@tag}[%04X] >> %02X" % [i, value] if @tag && ENV["VERBOSE"] && ENV["VERBOSE"].include?("m")
+      value
     end
 
     def []= index, value
       i = index.to_i
       check_bounds i
       @bytes[i] = [value.to_i].pack("C")
+      puts "#{@tag}[%04X] << %02X" % [i, value] if @tag && ENV["VERBOSE"] && ENV["VERBOSE"].include?("m")
     end
 
     def inspect
-      "#<#{self.class.name} @size=#{size}>"
+      "#<#{self.class.name} @size=#{size} @tag=#{@tag}>"
     end
 
     private
+
+    attr_accessor :bytes
 
     def check_bounds index
       if index < 0 || index >= size

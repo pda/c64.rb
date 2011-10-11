@@ -31,6 +31,12 @@ module C64
         registers.pc += 1
         parameters = [ i.addressing ]
         parameters << read_operand(i) if i.operand?
+        puts "PC:0x%04X OP:0x%02X %06s => %s" % [
+          reg.pc - 1,
+          memory[registers.pc - 1],
+          i.operand? ? "0x"+parameters[1].bytes.map{|b| b.to_s(16) }.join.upcase : "",
+          i.inspect
+        ] if ENV["VERBOSE"] && ENV["VERBOSE"].include?("i")
         registers.pc += i.operand_size
         send i.name, *parameters
         @cycles += i.cycles
