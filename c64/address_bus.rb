@@ -17,18 +17,24 @@ module C64
     attr_reader :ram, :kernal, :basic, :char, :io
 
     def [] address
-      case address
+      case address.to_i
 
-      when 0x0000..0x0001
-        raise "READ 0x%04X" % address
+      when 0x0000
+        # TODO: are reads from these addresses legal?
+        0
 
-      when 0xA000..0xAFFF
+      when 0x0001
+        # TODO: are reads from these addresses legal?
+        # raise "READ 0x%04X" % address
+        0
+
+      when 0xA000..0xBFFF
         @read_map[:loram][address - 0xA000]
 
       when 0xD000..0xDFFF
         @read_map[:charen][address - 0xD000]
 
-      when 0xE000..0xEFFF
+      when 0xE000..0xFFFF
         @read_map[:hiram][address - 0xE000]
 
       else
@@ -37,15 +43,19 @@ module C64
     end
 
     def []= address, value
-      case address
+      case address.to_i
 
       when 0x0000
-        raise "WRITE 0x%02X => 0x%04X" % [ value, address ]
+        # data port direction flags.
+        # TODO: something..
+        # raise unless value == 0b101111
 
       when 0x0001
+        # data port values.
         update_maps value
 
       when 0xD000..0xDFFF
+        # I/O or character generator.
         @write_map[:charen][address - 0xD000] = value
 
       else
