@@ -5,10 +5,10 @@ module C64
 
     def initialize banks
       @ram = banks[:ram]
-      @kernal = banks[:kernal]
-      @basic = banks[:basic]
-      @char = banks[:char]
-      @io = banks[:io]
+      @kernal = offset banks[:kernal], 0xE000
+      @basic = offset banks[:basic], 0xA000
+      @char = offset banks[:char], 0xD000
+      @io = offset banks[:io], 0xD000
 
       @write_map = { charen: @ram }
       @read_map = { loram: @ram, hiram: @ram, charen: @char }
@@ -29,13 +29,13 @@ module C64
         0
 
       when 0xA000..0xBFFF
-        @read_map[:loram][address - 0xA000]
+        @read_map[:loram][address]
 
       when 0xD000..0xDFFF
-        @read_map[:charen][address - 0xD000]
+        @read_map[:charen][address]
 
       when 0xE000..0xFFFF
-        @read_map[:hiram][address - 0xE000]
+        @read_map[:hiram][address]
 
       else
         ram[address]
@@ -56,7 +56,7 @@ module C64
 
       when 0xD000..0xDFFF
         # I/O or character generator.
-        @write_map[:charen][address - 0xD000] = value
+        @write_map[:charen][address] = value
 
       else
         ram[address] = value
@@ -72,6 +72,23 @@ module C64
       @read_map[:hiram] = value.hiram? ? @kernal : @ram
       @read_map[:charen] = value.charen? ? @io : @char
       @write_map[:charen] = value.charen? ? @io : @ram
+    end
+
+    def offset(data, offset)
+      OffsetAccess.new(data, offset)
+    end
+
+    class OffsetAccess
+      def initialize(data, offset)
+        @data = data
+        @offset = offset
+      end
+      def [] address
+        @data[address - @offset]
+      end
+      def []= address, value
+        @data[address - @offset] = value
+      end
     end
 
   end

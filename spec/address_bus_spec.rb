@@ -37,6 +37,7 @@ module C64
       it_addresses 0xA000, reads: :ram
       it_addresses 0xA000, writes: :ram
       it_addresses 0xD000, reads: :char, at: 0x0000
+      it_addresses 0xD007, reads: :char, at: 0x0007
       it_addresses 0xD000, writes: :ram
       it_addresses 0xE000, reads: :ram
       it_addresses 0xE000, writes: :ram
@@ -45,10 +46,14 @@ module C64
     describe "with control flags set 0b00000111" do
       before { bus[0x0001] = 0b00000111 }
       it_addresses 0xA000, reads: :basic, at: 0x0000
+      it_addresses 0xA007, reads: :basic, at: 0x0007
       it_addresses 0xA000, writes: :ram
       it_addresses 0xD000, reads: :io, at: 0x0000
+      it_addresses 0xD007, reads: :io, at: 0x0007
       it_addresses 0xD000, writes: :io, at: 0x0000
+      it_addresses 0xD007, writes: :io, at: 0x0007
       it_addresses 0xE000, reads: :kernal, at: 0x0000
+      it_addresses 0xE007, reads: :kernal, at: 0x0007
       it_addresses 0xE000, writes: :ram
     end
 
