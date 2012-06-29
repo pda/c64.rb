@@ -16,7 +16,7 @@ module C64
         end
 
         define_method :inspect do
-          fields = names.map { |n| "#{n}:#{self.send(n)}" }
+          fields = names.map { |n| "#{n}:#{self.send(n).to_i}" }
           "Bitfield(#{fields.join(" ")})"
         end
 
