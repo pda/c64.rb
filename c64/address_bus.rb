@@ -38,6 +38,7 @@ module C64
         @read_map[:hiram][address]
 
       else
+        raise OutOfBounds if address > 0xFFFF
         ram[address]
       end
     end
@@ -90,6 +91,9 @@ module C64
         @data[address - @offset] = value
       end
     end
+
+    Error = Class.new(StandardError)
+    OutOfBounds = Class.new(Error)
 
   end
 end

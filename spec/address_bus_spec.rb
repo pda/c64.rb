@@ -32,6 +32,10 @@ module C64
       end
     end
 
+    it "raises OutOfBounds for addresses over 0xFFFF" do
+      ->{ bus[0x10000] }.must_raise AddressBus::OutOfBounds
+    end
+
     describe "with control flags set zero" do
       before { bus[0x0001] = 0x00 }
       it_addresses 0xA000, reads: :ram
