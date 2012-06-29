@@ -4,8 +4,6 @@ module C64
     def self.new *names
       Class.new do
 
-        const_set :BITFIELD_NAMES, names
-
         def initialize value
           @value = value
         end
@@ -17,8 +15,8 @@ module C64
         def on_update name
         end
 
-        def inspect
-          fields = BITFIELD_NAMES.map { |n| "#{n}:#{self.send(n)}" }
+        define_method :inspect do
+          fields = names.map { |n| "#{n}:#{self.send(n)}" }
           "Bitfield(#{fields.join(" ")})"
         end
 

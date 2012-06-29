@@ -45,6 +45,9 @@ module C64
         bf.a.must_equal 0
         bf.b.must_equal 1
       end
+      it "can be inspected" do
+        bf.inspect.must_equal "Bitfield(a:0 b:1)"
+      end
     end
 
   end
