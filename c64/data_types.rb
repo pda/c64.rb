@@ -13,6 +13,11 @@ module C64
       @value = value.to_i & mask
     end
 
+    # http://www.ruby-doc.org/core-1.9.3/Numeric.html#method-i-coerce
+    def coerce(other)
+      [self.class.new(other), self]
+    end
+
     def to_i
       @value
     end

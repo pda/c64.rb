@@ -79,6 +79,14 @@ module C64
     it "converts to negative signed integer" do
       Uint8.new(256 - 8).to_signed.must_equal -8
     end
+
+    it "can have Fixnum added to it" do
+      (Uint8.new(32) + 32).must_equal 64
+    end
+
+    it "can be added to Fixnum (via coercion)" do
+      (32 + Uint8.new(32)).must_equal 64
+    end
   end
 
   describe Uint16 do
