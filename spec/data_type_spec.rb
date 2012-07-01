@@ -65,7 +65,7 @@ module C64
     end
 
     it "is inspectable" do
-      Uint8.new(32).inspect.must_equal "C64::Uint8(32)"
+      Uint8.new(32).inspect.must_equal "C64::Uint8(0x20)"
     end
 
     it "unpacks from String" do
@@ -120,6 +120,10 @@ module C64
       Uint16.new(0xDDEE).tap do |i|
         i.low = 0xAA
       end.must_equal 0xDDAA
+    end
+
+    it "is inspectable" do
+      Uint16.new(1024).inspect.must_equal "C64::Uint16(0x0400)"
     end
 
     it "unpacks from String" do

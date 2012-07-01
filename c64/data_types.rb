@@ -62,8 +62,10 @@ module C64
     end
 
     def inspect
-      "%s(%d)" % [ self.class.name, @value ]
+      "%s(0x%0#{bytes.length * 2}X)" % [ self.class.name, @value ]
     end
+
+    alias_method :to_s, :inspect
 
     private
 
