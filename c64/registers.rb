@@ -11,7 +11,7 @@ module C64
         x: Uint8.new(x),
         y: Uint8.new(y),
         sp: Uint8.new(sp),
-        sr: sr,
+        sr: Uint8.new(sr),
       }
     end
 
@@ -38,11 +38,7 @@ module C64
 
     # array-access writer
     def []= register, value
-      if register == :sr
-        @values[register] = value
-      else
-        @values[register].update value
-      end
+      @values[register].update value
     end
 
     class Status < ::C64::Bitfield.new(
@@ -50,7 +46,7 @@ module C64
 
       def initialize registers
         @registers = registers
-        super(registers.sr)
+        super(registers.sr.to_i)
       end
 
       def on_update name
