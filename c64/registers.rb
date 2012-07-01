@@ -5,38 +5,44 @@ module C64
   class Registers
 
     def initialize pc = 0, ac = 0, x = 0, y = 0, sr = 0, sp = 0
-      @pc = Uint16.new pc
-      @ac = Uint8.new ac
-      @x = Uint8.new x
-      @y = Uint8.new y
-      @sp = Uint8.new sp
-      @sr = sr
+      @values = {
+        pc: Uint16.new(pc),
+        ac: Uint8.new(ac),
+        x: Uint8.new(x),
+        y: Uint8.new(y),
+        sp: Uint8.new(sp),
+        sr: sr,
+      }
     end
 
     # register readers
-    def pc; @pc end
-    def ac; @ac end
-    def x; @x end
-    def y; @y end
-    def sp; @sp end
-    def sr; @sr end
+    def pc; self[:pc] end
+    def ac; self[:ac] end
+    def x; self[:x] end
+    def y; self[:y] end
+    def sp; self[:sp] end
+    def sr; self[:sr] end
 
     # register writers
-    def pc= value; @pc.update value end
-    def ac= value; @ac.update value end
-    def x= value; @x.update value end
-    def y= value; @y.update value end
-    def sp= value; @sp.update value end
-    def sr= value; @sr = value end
+    def pc= value; self[:pc] = value end
+    def ac= value; self[:ac] = value end
+    def x= value; self[:x] = value end
+    def y= value; self[:y] = value end
+    def sp= value; self[:sp] = value end
+    def sr= value; self[:sr] = value end
 
     # array-access reader
     def [] register
-      send register
+      @values[register]
     end
 
     # array-access writer
     def []= register, value
-      send "#{register}=", value
+      if register == :sr
+        @values[register] = value
+      else
+        @values[register].update value
+      end
     end
 
     class Status < ::C64::Bitfield.new(
